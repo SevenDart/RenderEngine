@@ -57,17 +57,35 @@ public class ObjFileParserTests
     
     
     
-    [TestCase("1 2 3")]
-    [TestCase("1 1 -1")]
-    public void ParsePolygon_OnlyVertices(string input)
+    [TestCase("1 2 3", false, false)]
+    [TestCase("1 2 -1", false, false)]
+    [TestCase("1/1 2/2 3/3", true, false)]
+    [TestCase("-1/-1 -2/-2 -3/-3", true, false)]
+    [TestCase("1/1/1 2/2/2 3/3/3", true, true)]
+    [TestCase("-1/-1/-1 -2/-2/-2 -3/-3/-3", true, true)]
+    public void ParsePolygon(string input, bool checkTextures, bool checkNormals)
     {
         //Arrange
         _fileParser.ParseLine("v 1 0 0");
         _fileParser.ParseLine("v 1 1 1");
         _fileParser.ParseLine("v 1 1 2");
+        
+        _fileParser.ParseLine("vt 1");
+        _fileParser.ParseLine("vt 2");
+        _fileParser.ParseLine("vt 3");
+        
+        _fileParser.ParseLine("vn 1 2 3");
+        _fileParser.ParseLine("vn 1 2 3");
+        _fileParser.ParseLine("vn 1 2 3");
         //Act
         var result = _fileParser.ParsePolygon(input.Split());
         //Assert
         Assert.AreEqual(3, result.Vertices.Count);
+        
+        if (checkTextures)
+            Assert.True(result.Vertices.TrueForAll(v => v.TextureCoordinates != null));
+        
+        if (checkNormals)
+            Assert.True(result.Vertices.TrueForAll(v => v.NormalVector != null));
     }
 }

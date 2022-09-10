@@ -95,21 +95,21 @@ public class ObjFileParser : IFileParser
 			var vertexValues = inputValue.Split('/');
 			
 			var index = int.Parse(vertexValues[0]);
-			index = index == -1 ? _vertices.Count - Math.Abs(index) : index - 1;
+			index = index < 0 ? _vertices.Count - Math.Abs(index) : index - 1;
 			
 			var vertex = _vertices[index];
 			
 			if (vertexValues.Length > 1 && vertexValues[1] != "")
 			{
 				index = int.Parse(vertexValues[1]);
-				index = index == -1 ? _vertexTextures.Count - Math.Abs(index) : index - 1;
+				index = index < 0 ? _vertexTextures.Count - Math.Abs(index) : index - 1;
 				vertex.TextureCoordinates = _vertexTextures[index];
 			}
 			
 			if (vertexValues.Length > 2 && vertexValues[2] != "")
 			{
 				index = int.Parse(vertexValues[2]);
-				index = index == -1 ? _vertexNormals.Count - Math.Abs(index) : index - 1;
+				index = index < 0 ? _vertexNormals.Count - Math.Abs(index) : index - 1;
 				vertex.NormalVector = _vertexNormals[index];
 			}
 			polygon.Vertices.Add(vertex);
