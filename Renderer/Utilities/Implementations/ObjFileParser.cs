@@ -14,17 +14,24 @@ public class ObjFileParser : IFileParser
 	{
 		ClearData();
 		
-		var renderObject = new RenderObject();
-
 		using var file = new StreamReader(filepath);
 
 		while (!file.EndOfStream)
 		{
 			var line = await file.ReadLineAsync();
-			if (line != null) 
+			if (line != null && line.Length > 0) 
 				ParseLine(line);
 		}
-		
+
+		var renderObject = new RenderObject()
+		{
+			Name = Path.GetFileName(filepath),
+			Pivot = new Pivot()
+			{
+				Center = new Vector3(0, 0, 0)
+			}
+		};
+
 		renderObject.Polygons.AddRange(_polygons);
 
 		return renderObject;
@@ -32,8 +39,14 @@ public class ObjFileParser : IFileParser
 
 	public void ParseLine(string input)
 	{
-		var lineType = input.Substring(0, input.IndexOf(' '));
-		var inputValues = input.Substring(input.IndexOf(' ') + 1).Split();
+		var spaceIndex = input.IndexOf(' ');
+		if (spaceIndex == -1)
+		{
+			return;
+		}
+
+		var lineType = input.Substring(0, spaceIndex);
+		var inputValues = input.Substring(spaceIndex + 1).Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
 		switch (lineType)
 		{
@@ -116,6 +129,21 @@ public class ObjFileParser : IFileParser
 		}
 
 		return polygon;
+	}
+
+	private Pivot GetPivot()
+	{
+		var pivot = new Pivot
+		{
+			Center = new Vector3()
+			{
+				X = _vertices.Sum(v => v.Coordinates.X) / _vertices.Count,
+				Y = _vertices.Sum(v => v.Coordinates.Y) / _vertices.Count,
+				Z = _vertices.Sum(v => v.Coordinates.Z) / _vertices.Count
+			}
+		};
+
+		return pivot;
 	}
 
 	private void ClearData()
