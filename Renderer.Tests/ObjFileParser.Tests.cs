@@ -1,6 +1,6 @@
 using System.Numerics;
-using Renderer.Utilities;
-using Renderer.Utilities.Implementations;
+using RenderEngine.Utilities;
+using RenderEngine.Utilities.Implementations;
 
 namespace Renderer.Tests;
 

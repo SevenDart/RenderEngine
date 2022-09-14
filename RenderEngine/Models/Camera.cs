@@ -1,15 +1,15 @@
 ﻿using System.Numerics;
 
-namespace Renderer.Models;
+namespace RenderEngine.Models;
 
 public class Camera: RenderObject
 {
-    public int ScreenWidth { get; set; } = 1024;
-	public int ScreenHeight { get; set; } = 720;
+    public int ScreenWidth { get; set; }
+	public int ScreenHeight { get; set; }
 
-	public float ScreenDistance { get; set; } = 200;
+	public float ScreenDistance { get; set; }
 
-    public float ViewAngle { get; set; } = 90;
+    public float ViewAngle { get; set; }
 
     public Camera(Vector3 position)
     {
@@ -28,7 +28,8 @@ public class Camera: RenderObject
 			return new Vector2(float.NaN, float.NaN);
 		}
 
-		var delta = (ScreenDistance / localCoordinates.Z) * ScreenWidth / (float)(2 * ScreenDistance * Math.Tan(ViewAngle / 2));
+		var delta = (ScreenDistance / localCoordinates.Z) * ScreenWidth 
+		            / (float)(2 * ScreenDistance * Math.Tan(ViewAngle * Math.PI / 360));
 
 		var projection = new Vector2(localCoordinates.X, localCoordinates.Y) * delta;
         
@@ -42,9 +43,9 @@ public class Camera: RenderObject
         return new Vector2(float.NaN, float.NaN);
 	}
 
-	public Vector2 ToScreenCoordinates(Vector2 v)
+    private Vector2 ToScreenCoordinates(Vector2 v)
 	{
-		v += new Vector2(ScreenWidth / 2, ScreenHeight / 2);
-        return new Vector2(v.X, -v.Y);
+		v += new Vector2(ScreenWidth / 2.0f, -ScreenHeight / 2.0f);
+        return v with { Y = -v.Y };
 	}
 }

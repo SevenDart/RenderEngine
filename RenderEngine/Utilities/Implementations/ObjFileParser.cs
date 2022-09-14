@@ -1,7 +1,7 @@
-﻿using Renderer.Models;
-using System.Numerics;
+﻿using System.Numerics;
+using RenderEngine.Models;
 
-namespace Renderer.Utilities.Implementations;
+namespace RenderEngine.Utilities.Implementations;
 
 public class ObjFileParser : IFileParser
 {

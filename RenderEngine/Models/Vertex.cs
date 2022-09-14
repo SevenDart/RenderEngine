@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace Renderer.Models;
+namespace RenderEngine.Models;
 
 public class Vertex
 {

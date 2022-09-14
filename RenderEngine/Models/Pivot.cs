@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace Renderer.Models;
+namespace RenderEngine.Models;
 
 public class Pivot
 {
@@ -35,5 +35,10 @@ public class Pivot
     public void Move(Vector3 v)
     {
         Center += v;
+    }
+
+    public void Rotate(Vector3 rotationAngles)
+    {
+        //TODO
     }
 }
