@@ -52,7 +52,15 @@ public partial class Form1 : Form
 
         renderObject.Pivot.Center = new Vector3((float)CurrentObjX.Value, (float)CurrentObjY.Value, (float)CurrentObjZ.Value);
         
-        renderObject.Rotate(new Vector3((float)CurrentObjLeanYZ.Value, (float)CurrentObjLeanXZ.Value, (float)CurrentObjLeanXY.Value));
+        renderObject.Rotate(new Vector3(
+            (float)CurrentObjLeanYZ.Value, 
+            (float)CurrentObjLeanXZ.Value, 
+            (float)CurrentObjLeanXY.Value));
+        
+        renderObject.Scale(new Vector3(
+            (float)ObjectScaleX.Value, 
+            (float)ObjectScaleY.Value, 
+            (float)ObjectScaleZ.Value));
         
         _renderer.Render();
     }
@@ -118,9 +126,9 @@ public partial class Form1 : Form
         CurrentObjLeanXZ.Value = (decimal)renderObject.Rotation.Y;
         CurrentObjLeanXY.Value = (decimal)renderObject.Rotation.Z;
 
-        ObjectScaleX.Value = (decimal)renderObject.Scale.X;
-        ObjectScaleY.Value = (decimal)renderObject.Scale.Y;
-        ObjectScaleZ.Value = (decimal)renderObject.Scale.Z;
+        ObjectScaleX.Value = (decimal)renderObject.ScaleVector.X;
+        ObjectScaleY.Value = (decimal)renderObject.ScaleVector.Y;
+        ObjectScaleZ.Value = (decimal)renderObject.ScaleVector.Z;
     }
 
     private void UseObjectRadioButton_CheckedChanged(object sender, EventArgs e)
@@ -185,5 +193,15 @@ public partial class Form1 : Form
         CurrentObjLeanYZ.Value = (decimal)renderObject.Rotation.X;
         CurrentObjLeanXZ.Value = (decimal)renderObject.Rotation.Y;
         CurrentObjLeanXY.Value = (decimal)renderObject.Rotation.Z;
+    }
+
+    private void DrawField_DragEnter(object sender, DragEventArgs e)
+    {
+        
+    }
+
+    private void DrawField_DragDrop(object sender, DragEventArgs e)
+    {
+
     }
 }

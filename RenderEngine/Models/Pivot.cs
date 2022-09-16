@@ -52,4 +52,11 @@ public class Pivot
         ZAxis = Vector3.Transform(ZAxis, xRotation);
         ZAxis = Vector3.Transform(ZAxis, yRotation);
     }
+
+    public void Scale(Vector3 scaleVector)
+    {
+        XAxis *= scaleVector;
+        YAxis *= scaleVector;
+        ZAxis *= scaleVector;
+    }
 }

@@ -8,7 +8,7 @@ public class RenderObject
 	public List<Polygon> Polygons { get; set; } = new();
 	public Pivot Pivot { get; set; } = null!;
 	public Vector3 Rotation { get; set; } = new(0, 0, 0);
-	public Vector3 Scale { get; set; } = new(1, 1, 1);
+	public Vector3 ScaleVector { get; set; } = new(1, 1, 1);
 
 	public void Move(Vector3 v)
 	{
@@ -19,5 +19,11 @@ public class RenderObject
 	{
 		Pivot.Rotate(rotationAngles - Rotation);
 		Rotation = rotationAngles;
+	}
+
+	public void Scale(Vector3 scale)
+	{
+		Pivot.Scale(scale / ScaleVector);
+		ScaleVector = scale;
 	}
 }

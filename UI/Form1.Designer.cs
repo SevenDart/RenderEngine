@@ -117,6 +117,8 @@ partial class Form1
 			this.DrawField.Size = new System.Drawing.Size(1017, 645);
 			this.DrawField.TabIndex = 0;
 			this.DrawField.TabStop = false;
+			this.DrawField.DragDrop += new System.Windows.Forms.DragEventHandler(this.DrawField_DragDrop);
+			this.DrawField.DragEnter += new System.Windows.Forms.DragEventHandler(this.DrawField_DragEnter);
 			// 
 			// RenderObjectsList
 			// 
@@ -673,6 +675,11 @@ partial class Form1
 			this.ObjectScaleX.Name = "ObjectScaleX";
 			this.ObjectScaleX.Size = new System.Drawing.Size(51, 27);
 			this.ObjectScaleX.TabIndex = 40;
+			this.ObjectScaleX.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
 			// 
 			// ObjectScaleZ
 			// 
@@ -687,6 +694,11 @@ partial class Form1
 			this.ObjectScaleZ.Name = "ObjectScaleZ";
 			this.ObjectScaleZ.Size = new System.Drawing.Size(51, 27);
 			this.ObjectScaleZ.TabIndex = 39;
+			this.ObjectScaleZ.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
 			// 
 			// ObjectScaleY
 			// 
@@ -701,6 +713,11 @@ partial class Form1
 			this.ObjectScaleY.Name = "ObjectScaleY";
 			this.ObjectScaleY.Size = new System.Drawing.Size(51, 27);
 			this.ObjectScaleY.TabIndex = 38;
+			this.ObjectScaleY.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
 			// 
 			// UseCameraRadioButton
 			// 
