@@ -9,7 +9,7 @@ public class Pivot
     public Vector3 YAxis { get; set; } = new(0, 1, 0);
 	public Vector3 ZAxis { get; set; } = new(0, 0, 1);
 
-	private Matrix4x4 LocalCoordsMatrix => new(
+    private Matrix4x4 LocalCoordsMatrix => new(
         XAxis.X, YAxis.X, ZAxis.X, 0,
         XAxis.Y, YAxis.Y, ZAxis.Y, 0,
         XAxis.Z, YAxis.Z, ZAxis.Z, 0,
@@ -39,6 +39,17 @@ public class Pivot
 
     public void Rotate(Vector3 rotationAngles)
     {
-        //TODO
+        var xRotation = Matrix4x4.CreateRotationX((float)(rotationAngles.X * Math.PI / 180));
+        var yRotation = Matrix4x4.CreateRotationY((float)(rotationAngles.Y * Math.PI / 180));
+        var zRotation = Matrix4x4.CreateRotationZ((float)(rotationAngles.Z * Math.PI / 180));
+        
+        XAxis = Vector3.Transform(XAxis, yRotation);
+        XAxis = Vector3.Transform(XAxis, zRotation);
+        
+        YAxis = Vector3.Transform(YAxis, xRotation);
+        YAxis = Vector3.Transform(YAxis, zRotation);
+        
+        ZAxis = Vector3.Transform(ZAxis, xRotation);
+        ZAxis = Vector3.Transform(ZAxis, yRotation);
     }
 }

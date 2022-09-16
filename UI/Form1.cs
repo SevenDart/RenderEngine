@@ -47,6 +47,8 @@ public partial class Form1 : Form
 
         renderObject.Pivot.Center = new Vector3((float)CurrentObjX.Value, (float)CurrentObjY.Value, (float)CurrentObjZ.Value);
         
+        renderObject.Rotate(new Vector3((float)CurrentObjLeanYZ.Value, (float)CurrentObjLeanXZ.Value, (float)CurrentObjLeanXY.Value));
+        
         _renderer.Render();
     }
 
@@ -55,6 +57,8 @@ public partial class Form1 : Form
         _scene.Camera.Pivot.Center = new Vector3((float)CameraX.Value, (float)CameraY.Value, (float)CameraZ.Value);
         _scene.Camera.ScreenDistance = 1 / (float)CameraScreenDist.Value;
         _scene.Camera.ViewAngle = (int)CameraFoV.Value;
+        
+        _scene.Camera.Rotate(new Vector3((float)CameraLeanYZ.Value, (float)CameraLeanXZ.Value, (float)CameraLeanXY.Value));
 
         _renderer.Render();
     }
@@ -95,5 +99,32 @@ public partial class Form1 : Form
         RenderObjectsList.SetSelected(RenderObjectsList.Items.Count - 1, true);
 
         _renderer.Render();
+    }
+
+    private void RenderObjectsList_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        var renderObject = _scene.RenderObjects.First(r => r.Name == RenderObjectsList.SelectedItem.ToString());
+
+        CurrentObjX.Value = (decimal)renderObject.Pivot.Center.X;
+        CurrentObjY.Value = (decimal)renderObject.Pivot.Center.Y;
+        CurrentObjZ.Value = (decimal)renderObject.Pivot.Center.Z;
+
+        CurrentObjLeanYZ.Value = (decimal)renderObject.Rotation.X;
+        CurrentObjLeanXZ.Value = (decimal)renderObject.Rotation.Y;
+        CurrentObjLeanXY.Value = (decimal)renderObject.Rotation.Z;
+
+        ObjectScaleX.Value = (decimal)renderObject.Scale.X;
+        ObjectScaleY.Value = (decimal)renderObject.Scale.Y;
+        ObjectScaleZ.Value = (decimal)renderObject.Scale.Z;
+    }
+
+    private void UseCameraRadioButtion_CheckedChanged(object sender, EventArgs e)
+    {
+
+    }
+
+    private void UseObjectRadioButton_CheckedChanged(object sender, EventArgs e)
+    {
+
     }
 }

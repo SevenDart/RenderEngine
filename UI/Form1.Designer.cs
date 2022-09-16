@@ -64,10 +64,25 @@ partial class Form1
 			this.OpenObjFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.label11 = new System.Windows.Forms.Label();
 			this.label16 = new System.Windows.Forms.Label();
-			this.CameraLeanXY = new System.Windows.Forms.Label();
+			this.labelXY = new System.Windows.Forms.Label();
 			this.CameraLeanYZ = new System.Windows.Forms.NumericUpDown();
-			this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
+			this.CameraLeanXY = new System.Windows.Forms.NumericUpDown();
 			this.CameraLeanXZ = new System.Windows.Forms.NumericUpDown();
+			this.label17 = new System.Windows.Forms.Label();
+			this.label18 = new System.Windows.Forms.Label();
+			this.label19 = new System.Windows.Forms.Label();
+			this.label20 = new System.Windows.Forms.Label();
+			this.ObjectScaleX = new System.Windows.Forms.NumericUpDown();
+			this.ObjectScaleZ = new System.Windows.Forms.NumericUpDown();
+			this.ObjectScaleY = new System.Windows.Forms.NumericUpDown();
+			this.UseCameraRadioButtion = new System.Windows.Forms.RadioButton();
+			this.UseObjectRadioButton = new System.Windows.Forms.RadioButton();
+			this.label21 = new System.Windows.Forms.Label();
+			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.label22 = new System.Windows.Forms.Label();
+			this.ObjectLockNoRadioButton = new System.Windows.Forms.RadioButton();
+			this.ObjectLockYesRadioButton = new System.Windows.Forms.RadioButton();
 			((System.ComponentModel.ISupportInitialize)(this.DrawField)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.CameraY)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.CameraX)).BeginInit();
@@ -81,8 +96,13 @@ partial class Form1
 			((System.ComponentModel.ISupportInitialize)(this.CurrentObjLeanXY)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.CurrentObjLeanXZ)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.CameraLeanYZ)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.CameraLeanXY)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.CameraLeanXZ)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.ObjectScaleX)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.ObjectScaleZ)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.ObjectScaleY)).BeginInit();
+			this.groupBox1.SuspendLayout();
+			this.groupBox2.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// DrawField
@@ -104,6 +124,7 @@ partial class Form1
 			this.RenderObjectsList.Name = "RenderObjectsList";
 			this.RenderObjectsList.Size = new System.Drawing.Size(253, 644);
 			this.RenderObjectsList.TabIndex = 1;
+			this.RenderObjectsList.SelectedIndexChanged += new System.EventHandler(this.RenderObjectsList_SelectedIndexChanged);
 			// 
 			// CameraY
 			// 
@@ -199,7 +220,7 @@ partial class Form1
 			// 
 			// SetCameraSettingsButton
 			// 
-			this.SetCameraSettingsButton.Location = new System.Drawing.Point(1122, 870);
+			this.SetCameraSettingsButton.Location = new System.Drawing.Point(1121, 863);
 			this.SetCameraSettingsButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
 			this.SetCameraSettingsButton.Name = "SetCameraSettingsButton";
 			this.SetCameraSettingsButton.Size = new System.Drawing.Size(86, 31);
@@ -212,7 +233,7 @@ partial class Form1
 			// 
 			this.label4.AutoSize = true;
 			this.label4.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.label4.Location = new System.Drawing.Point(1091, 671);
+			this.label4.Location = new System.Drawing.Point(1061, 671);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(154, 28);
 			this.label4.TabIndex = 9;
@@ -371,7 +392,7 @@ partial class Form1
 			// 
 			// SetObjectSettingsButton
 			// 
-			this.SetObjectSettingsButton.Location = new System.Drawing.Point(632, 825);
+			this.SetObjectSettingsButton.Location = new System.Drawing.Point(632, 863);
 			this.SetObjectSettingsButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
 			this.SetObjectSettingsButton.Name = "SetObjectSettingsButton";
 			this.SetObjectSettingsButton.Size = new System.Drawing.Size(86, 31);
@@ -384,7 +405,7 @@ partial class Form1
 			// 
 			this.labelYZ.AutoSize = true;
 			this.labelYZ.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.labelYZ.Location = new System.Drawing.Point(728, 768);
+			this.labelYZ.Location = new System.Drawing.Point(526, 766);
 			this.labelYZ.Name = "labelYZ";
 			this.labelYZ.Size = new System.Drawing.Size(33, 23);
 			this.labelYZ.TabIndex = 27;
@@ -394,7 +415,7 @@ partial class Form1
 			// 
 			this.label12.AutoSize = true;
 			this.label12.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.label12.Location = new System.Drawing.Point(625, 769);
+			this.label12.Location = new System.Drawing.Point(630, 766);
 			this.label12.Name = "label12";
 			this.label12.Size = new System.Drawing.Size(34, 23);
 			this.label12.TabIndex = 26;
@@ -404,7 +425,7 @@ partial class Form1
 			// 
 			this.label13.AutoSize = true;
 			this.label13.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.label13.Location = new System.Drawing.Point(520, 769);
+			this.label13.Location = new System.Drawing.Point(738, 768);
 			this.label13.Name = "label13";
 			this.label13.Size = new System.Drawing.Size(33, 23);
 			this.label13.TabIndex = 25;
@@ -412,39 +433,54 @@ partial class Form1
 			// 
 			// CurrentObjLeanYZ
 			// 
-			this.CurrentObjLeanYZ.Location = new System.Drawing.Point(766, 767);
+			this.CurrentObjLeanYZ.Location = new System.Drawing.Point(564, 765);
 			this.CurrentObjLeanYZ.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
 			this.CurrentObjLeanYZ.Maximum = new decimal(new int[] {
             360,
             0,
             0,
             0});
+			this.CurrentObjLeanYZ.Minimum = new decimal(new int[] {
+            360,
+            0,
+            0,
+            -2147483648});
 			this.CurrentObjLeanYZ.Name = "CurrentObjLeanYZ";
 			this.CurrentObjLeanYZ.Size = new System.Drawing.Size(51, 27);
 			this.CurrentObjLeanYZ.TabIndex = 24;
 			// 
 			// CurrentObjLeanXY
 			// 
-			this.CurrentObjLeanXY.Location = new System.Drawing.Point(561, 767);
+			this.CurrentObjLeanXY.Location = new System.Drawing.Point(779, 765);
 			this.CurrentObjLeanXY.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
 			this.CurrentObjLeanXY.Maximum = new decimal(new int[] {
             360,
             0,
             0,
             0});
+			this.CurrentObjLeanXY.Minimum = new decimal(new int[] {
+            360,
+            0,
+            0,
+            -2147483648});
 			this.CurrentObjLeanXY.Name = "CurrentObjLeanXY";
 			this.CurrentObjLeanXY.Size = new System.Drawing.Size(51, 27);
 			this.CurrentObjLeanXY.TabIndex = 23;
 			// 
 			// CurrentObjLeanXZ
 			// 
-			this.CurrentObjLeanXZ.Location = new System.Drawing.Point(662, 767);
+			this.CurrentObjLeanXZ.Location = new System.Drawing.Point(667, 764);
 			this.CurrentObjLeanXZ.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
 			this.CurrentObjLeanXZ.Maximum = new decimal(new int[] {
             360,
             0,
             0,
             0});
+			this.CurrentObjLeanXZ.Minimum = new decimal(new int[] {
+            360,
+            0,
+            0,
+            -2147483648});
 			this.CurrentObjLeanXZ.Name = "CurrentObjLeanXZ";
 			this.CurrentObjLeanXZ.Size = new System.Drawing.Size(51, 27);
 			this.CurrentObjLeanXZ.TabIndex = 22;
@@ -463,7 +499,7 @@ partial class Form1
 			// 
 			this.label15.AutoSize = true;
 			this.label15.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.label15.Location = new System.Drawing.Point(440, 768);
+			this.label15.Location = new System.Drawing.Point(444, 768);
 			this.label15.Name = "label15";
 			this.label15.Size = new System.Drawing.Size(64, 25);
 			this.label15.TabIndex = 29;
@@ -501,7 +537,7 @@ partial class Form1
 			// 
 			this.label11.AutoSize = true;
 			this.label11.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.label11.Location = new System.Drawing.Point(1200, 765);
+			this.label11.Location = new System.Drawing.Point(985, 766);
 			this.label11.Name = "label11";
 			this.label11.Size = new System.Drawing.Size(33, 23);
 			this.label11.TabIndex = 37;
@@ -517,41 +553,51 @@ partial class Form1
 			this.label16.TabIndex = 36;
 			this.label16.Text = "XZ:";
 			// 
-			// CameraLeanXY
+			// labelXY
 			// 
-			this.CameraLeanXY.AutoSize = true;
-			this.CameraLeanXY.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.CameraLeanXY.Location = new System.Drawing.Point(992, 766);
-			this.CameraLeanXY.Name = "CameraLeanXY";
-			this.CameraLeanXY.Size = new System.Drawing.Size(33, 23);
-			this.CameraLeanXY.TabIndex = 35;
-			this.CameraLeanXY.Text = "XY:";
+			this.labelXY.AutoSize = true;
+			this.labelXY.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.labelXY.Location = new System.Drawing.Point(1199, 764);
+			this.labelXY.Name = "labelXY";
+			this.labelXY.Size = new System.Drawing.Size(33, 23);
+			this.labelXY.TabIndex = 35;
+			this.labelXY.Text = "XY:";
 			// 
 			// CameraLeanYZ
 			// 
-			this.CameraLeanYZ.Location = new System.Drawing.Point(1240, 761);
+			this.CameraLeanYZ.Location = new System.Drawing.Point(1025, 762);
 			this.CameraLeanYZ.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
 			this.CameraLeanYZ.Maximum = new decimal(new int[] {
             360,
             0,
             0,
             0});
+			this.CameraLeanYZ.Minimum = new decimal(new int[] {
+            360,
+            0,
+            0,
+            -2147483648});
 			this.CameraLeanYZ.Name = "CameraLeanYZ";
 			this.CameraLeanYZ.Size = new System.Drawing.Size(51, 27);
 			this.CameraLeanYZ.TabIndex = 34;
 			// 
-			// numericUpDown2
+			// CameraLeanXY
 			// 
-			this.numericUpDown2.Location = new System.Drawing.Point(1033, 764);
-			this.numericUpDown2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-			this.numericUpDown2.Maximum = new decimal(new int[] {
+			this.CameraLeanXY.Location = new System.Drawing.Point(1240, 762);
+			this.CameraLeanXY.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+			this.CameraLeanXY.Maximum = new decimal(new int[] {
             360,
             0,
             0,
             0});
-			this.numericUpDown2.Name = "numericUpDown2";
-			this.numericUpDown2.Size = new System.Drawing.Size(51, 27);
-			this.numericUpDown2.TabIndex = 33;
+			this.CameraLeanXY.Minimum = new decimal(new int[] {
+            360,
+            0,
+            0,
+            -2147483648});
+			this.CameraLeanXY.Name = "CameraLeanXY";
+			this.CameraLeanXY.Size = new System.Drawing.Size(51, 27);
+			this.CameraLeanXY.TabIndex = 33;
 			// 
 			// CameraLeanXZ
 			// 
@@ -562,20 +608,204 @@ partial class Form1
             0,
             0,
             0});
+			this.CameraLeanXZ.Minimum = new decimal(new int[] {
+            360,
+            0,
+            0,
+            -2147483648});
 			this.CameraLeanXZ.Name = "CameraLeanXZ";
 			this.CameraLeanXZ.Size = new System.Drawing.Size(51, 27);
 			this.CameraLeanXZ.TabIndex = 32;
+			// 
+			// label17
+			// 
+			this.label17.AutoSize = true;
+			this.label17.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.label17.Location = new System.Drawing.Point(444, 817);
+			this.label17.Name = "label17";
+			this.label17.Size = new System.Drawing.Size(60, 25);
+			this.label17.TabIndex = 44;
+			this.label17.Text = "Scale:";
+			// 
+			// label18
+			// 
+			this.label18.AutoSize = true;
+			this.label18.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.label18.Location = new System.Drawing.Point(526, 816);
+			this.label18.Name = "label18";
+			this.label18.Size = new System.Drawing.Size(24, 23);
+			this.label18.TabIndex = 43;
+			this.label18.Text = "X:";
+			// 
+			// label19
+			// 
+			this.label19.AutoSize = true;
+			this.label19.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.label19.Location = new System.Drawing.Point(630, 816);
+			this.label19.Name = "label19";
+			this.label19.Size = new System.Drawing.Size(23, 23);
+			this.label19.TabIndex = 42;
+			this.label19.Text = "Y:";
+			// 
+			// label20
+			// 
+			this.label20.AutoSize = true;
+			this.label20.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.label20.Location = new System.Drawing.Point(738, 818);
+			this.label20.Name = "label20";
+			this.label20.Size = new System.Drawing.Size(24, 23);
+			this.label20.TabIndex = 41;
+			this.label20.Text = "Z:";
+			// 
+			// ObjectScaleX
+			// 
+			this.ObjectScaleX.DecimalPlaces = 1;
+			this.ObjectScaleX.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+			this.ObjectScaleX.Location = new System.Drawing.Point(564, 815);
+			this.ObjectScaleX.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+			this.ObjectScaleX.Name = "ObjectScaleX";
+			this.ObjectScaleX.Size = new System.Drawing.Size(51, 27);
+			this.ObjectScaleX.TabIndex = 40;
+			// 
+			// ObjectScaleZ
+			// 
+			this.ObjectScaleZ.DecimalPlaces = 1;
+			this.ObjectScaleZ.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+			this.ObjectScaleZ.Location = new System.Drawing.Point(779, 815);
+			this.ObjectScaleZ.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+			this.ObjectScaleZ.Name = "ObjectScaleZ";
+			this.ObjectScaleZ.Size = new System.Drawing.Size(51, 27);
+			this.ObjectScaleZ.TabIndex = 39;
+			// 
+			// ObjectScaleY
+			// 
+			this.ObjectScaleY.DecimalPlaces = 1;
+			this.ObjectScaleY.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+			this.ObjectScaleY.Location = new System.Drawing.Point(667, 814);
+			this.ObjectScaleY.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+			this.ObjectScaleY.Name = "ObjectScaleY";
+			this.ObjectScaleY.Size = new System.Drawing.Size(51, 27);
+			this.ObjectScaleY.TabIndex = 38;
+			// 
+			// UseCameraRadioButtion
+			// 
+			this.UseCameraRadioButtion.AutoSize = true;
+			this.UseCameraRadioButtion.Location = new System.Drawing.Point(96, 12);
+			this.UseCameraRadioButtion.Name = "UseCameraRadioButtion";
+			this.UseCameraRadioButtion.Size = new System.Drawing.Size(81, 24);
+			this.UseCameraRadioButtion.TabIndex = 45;
+			this.UseCameraRadioButtion.TabStop = true;
+			this.UseCameraRadioButtion.Text = "Camera";
+			this.UseCameraRadioButtion.UseVisualStyleBackColor = true;
+			this.UseCameraRadioButtion.CheckedChanged += new System.EventHandler(this.UseCameraRadioButtion_CheckedChanged);
+			// 
+			// UseObjectRadioButton
+			// 
+			this.UseObjectRadioButton.AutoSize = true;
+			this.UseObjectRadioButton.Location = new System.Drawing.Point(183, 12);
+			this.UseObjectRadioButton.Name = "UseObjectRadioButton";
+			this.UseObjectRadioButton.Size = new System.Drawing.Size(74, 24);
+			this.UseObjectRadioButton.TabIndex = 46;
+			this.UseObjectRadioButton.TabStop = true;
+			this.UseObjectRadioButton.Text = "Object";
+			this.UseObjectRadioButton.UseVisualStyleBackColor = true;
+			this.UseObjectRadioButton.CheckedChanged += new System.EventHandler(this.UseObjectRadioButton_CheckedChanged);
+			// 
+			// label21
+			// 
+			this.label21.AutoSize = true;
+			this.label21.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.label21.Location = new System.Drawing.Point(6, 10);
+			this.label21.Name = "label21";
+			this.label21.Size = new System.Drawing.Size(82, 28);
+			this.label21.TabIndex = 47;
+			this.label21.Text = "Control:";
+			// 
+			// groupBox1
+			// 
+			this.groupBox1.Controls.Add(this.label21);
+			this.groupBox1.Controls.Add(this.UseObjectRadioButton);
+			this.groupBox1.Controls.Add(this.UseCameraRadioButtion);
+			this.groupBox1.Location = new System.Drawing.Point(1018, 901);
+			this.groupBox1.Name = "groupBox1";
+			this.groupBox1.Size = new System.Drawing.Size(273, 41);
+			this.groupBox1.TabIndex = 48;
+			this.groupBox1.TabStop = false;
+			// 
+			// groupBox2
+			// 
+			this.groupBox2.Controls.Add(this.label22);
+			this.groupBox2.Controls.Add(this.ObjectLockNoRadioButton);
+			this.groupBox2.Controls.Add(this.ObjectLockYesRadioButton);
+			this.groupBox2.Location = new System.Drawing.Point(1018, 950);
+			this.groupBox2.Name = "groupBox2";
+			this.groupBox2.Size = new System.Drawing.Size(274, 41);
+			this.groupBox2.TabIndex = 49;
+			this.groupBox2.TabStop = false;
+			// 
+			// label22
+			// 
+			this.label22.AutoSize = true;
+			this.label22.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.label22.Location = new System.Drawing.Point(7, 9);
+			this.label22.Name = "label22";
+			this.label22.Size = new System.Drawing.Size(119, 28);
+			this.label22.TabIndex = 47;
+			this.label22.Text = "Object Lock:";
+			// 
+			// ObjectLockNoRadioButton
+			// 
+			this.ObjectLockNoRadioButton.AutoSize = true;
+			this.ObjectLockNoRadioButton.Location = new System.Drawing.Point(195, 13);
+			this.ObjectLockNoRadioButton.Name = "ObjectLockNoRadioButton";
+			this.ObjectLockNoRadioButton.Size = new System.Drawing.Size(50, 24);
+			this.ObjectLockNoRadioButton.TabIndex = 46;
+			this.ObjectLockNoRadioButton.TabStop = true;
+			this.ObjectLockNoRadioButton.Text = "No";
+			this.ObjectLockNoRadioButton.UseVisualStyleBackColor = true;
+			// 
+			// ObjectLockYesRadioButton
+			// 
+			this.ObjectLockYesRadioButton.AutoSize = true;
+			this.ObjectLockYesRadioButton.Location = new System.Drawing.Point(132, 13);
+			this.ObjectLockYesRadioButton.Name = "ObjectLockYesRadioButton";
+			this.ObjectLockYesRadioButton.Size = new System.Drawing.Size(51, 24);
+			this.ObjectLockYesRadioButton.TabIndex = 45;
+			this.ObjectLockYesRadioButton.TabStop = true;
+			this.ObjectLockYesRadioButton.Text = "Yes";
+			this.ObjectLockYesRadioButton.UseVisualStyleBackColor = true;
 			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(1305, 1011);
+			this.Controls.Add(this.groupBox2);
+			this.Controls.Add(this.groupBox1);
+			this.Controls.Add(this.label17);
+			this.Controls.Add(this.label18);
+			this.Controls.Add(this.label19);
+			this.Controls.Add(this.label20);
+			this.Controls.Add(this.ObjectScaleX);
+			this.Controls.Add(this.ObjectScaleZ);
+			this.Controls.Add(this.ObjectScaleY);
 			this.Controls.Add(this.label11);
 			this.Controls.Add(this.label16);
-			this.Controls.Add(this.CameraLeanXY);
+			this.Controls.Add(this.labelXY);
 			this.Controls.Add(this.CameraLeanYZ);
-			this.Controls.Add(this.numericUpDown2);
+			this.Controls.Add(this.CameraLeanXY);
 			this.Controls.Add(this.CameraLeanXZ);
 			this.Controls.Add(this.RemoveObjectButton);
 			this.Controls.Add(this.AddObjectButton);
@@ -625,8 +855,15 @@ partial class Form1
 			((System.ComponentModel.ISupportInitialize)(this.CurrentObjLeanXY)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.CurrentObjLeanXZ)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.CameraLeanYZ)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.CameraLeanXY)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.CameraLeanXZ)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.ObjectScaleX)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.ObjectScaleZ)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.ObjectScaleY)).EndInit();
+			this.groupBox1.ResumeLayout(false);
+			this.groupBox1.PerformLayout();
+			this.groupBox2.ResumeLayout(false);
+			this.groupBox2.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -669,8 +906,23 @@ partial class Form1
 	private OpenFileDialog OpenObjFileDialog;
 	private Label label11;
 	private Label label16;
-	private Label CameraLeanXY;
+	private Label labelXY;
 	private NumericUpDown CameraLeanYZ;
-	private NumericUpDown numericUpDown2;
+	private NumericUpDown CameraLeanXY;
 	private NumericUpDown CameraLeanXZ;
+	private Label label17;
+	private Label label18;
+	private Label label19;
+	private Label label20;
+	private NumericUpDown ObjectScaleX;
+	private NumericUpDown ObjectScaleZ;
+	private NumericUpDown ObjectScaleY;
+	private RadioButton UseCameraRadioButtion;
+	private RadioButton UseObjectRadioButton;
+	private Label label21;
+	private GroupBox groupBox1;
+	private GroupBox groupBox2;
+	private Label label22;
+	private RadioButton ObjectLockNoRadioButton;
+	private RadioButton ObjectLockYesRadioButton;
 }
