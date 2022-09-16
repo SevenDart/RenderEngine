@@ -75,7 +75,7 @@ partial class Form1
 			this.ObjectScaleX = new System.Windows.Forms.NumericUpDown();
 			this.ObjectScaleZ = new System.Windows.Forms.NumericUpDown();
 			this.ObjectScaleY = new System.Windows.Forms.NumericUpDown();
-			this.UseCameraRadioButtion = new System.Windows.Forms.RadioButton();
+			this.UseCameraRadioButton = new System.Windows.Forms.RadioButton();
 			this.UseObjectRadioButton = new System.Windows.Forms.RadioButton();
 			this.label21 = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -83,6 +83,8 @@ partial class Form1
 			this.label22 = new System.Windows.Forms.Label();
 			this.ObjectLockNoRadioButton = new System.Windows.Forms.RadioButton();
 			this.ObjectLockYesRadioButton = new System.Windows.Forms.RadioButton();
+			this.MovementSpeedControl = new System.Windows.Forms.NumericUpDown();
+			this.label23 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.DrawField)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.CameraY)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.CameraX)).BeginInit();
@@ -103,6 +105,7 @@ partial class Form1
 			((System.ComponentModel.ISupportInitialize)(this.ObjectScaleY)).BeginInit();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.MovementSpeedControl)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// DrawField
@@ -699,17 +702,18 @@ partial class Form1
 			this.ObjectScaleY.Size = new System.Drawing.Size(51, 27);
 			this.ObjectScaleY.TabIndex = 38;
 			// 
-			// UseCameraRadioButtion
+			// UseCameraRadioButton
 			// 
-			this.UseCameraRadioButtion.AutoSize = true;
-			this.UseCameraRadioButtion.Location = new System.Drawing.Point(96, 12);
-			this.UseCameraRadioButtion.Name = "UseCameraRadioButtion";
-			this.UseCameraRadioButtion.Size = new System.Drawing.Size(81, 24);
-			this.UseCameraRadioButtion.TabIndex = 45;
-			this.UseCameraRadioButtion.TabStop = true;
-			this.UseCameraRadioButtion.Text = "Camera";
-			this.UseCameraRadioButtion.UseVisualStyleBackColor = true;
-			this.UseCameraRadioButtion.CheckedChanged += new System.EventHandler(this.UseCameraRadioButtion_CheckedChanged);
+			this.UseCameraRadioButton.AutoSize = true;
+			this.UseCameraRadioButton.Checked = true;
+			this.UseCameraRadioButton.Location = new System.Drawing.Point(96, 12);
+			this.UseCameraRadioButton.Name = "UseCameraRadioButton";
+			this.UseCameraRadioButton.Size = new System.Drawing.Size(81, 24);
+			this.UseCameraRadioButton.TabIndex = 45;
+			this.UseCameraRadioButton.TabStop = true;
+			this.UseCameraRadioButton.Text = "Camera";
+			this.UseCameraRadioButton.UseVisualStyleBackColor = true;
+			this.UseCameraRadioButton.CheckedChanged += new System.EventHandler(this.UseCameraRadioButton_CheckedChanged);
 			// 
 			// UseObjectRadioButton
 			// 
@@ -718,7 +722,6 @@ partial class Form1
 			this.UseObjectRadioButton.Name = "UseObjectRadioButton";
 			this.UseObjectRadioButton.Size = new System.Drawing.Size(74, 24);
 			this.UseObjectRadioButton.TabIndex = 46;
-			this.UseObjectRadioButton.TabStop = true;
 			this.UseObjectRadioButton.Text = "Object";
 			this.UseObjectRadioButton.UseVisualStyleBackColor = true;
 			this.UseObjectRadioButton.CheckedChanged += new System.EventHandler(this.UseObjectRadioButton_CheckedChanged);
@@ -737,8 +740,8 @@ partial class Form1
 			// 
 			this.groupBox1.Controls.Add(this.label21);
 			this.groupBox1.Controls.Add(this.UseObjectRadioButton);
-			this.groupBox1.Controls.Add(this.UseCameraRadioButtion);
-			this.groupBox1.Location = new System.Drawing.Point(1018, 901);
+			this.groupBox1.Controls.Add(this.UseCameraRadioButton);
+			this.groupBox1.Location = new System.Drawing.Point(14, 723);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(273, 41);
 			this.groupBox1.TabIndex = 48;
@@ -749,7 +752,7 @@ partial class Form1
 			this.groupBox2.Controls.Add(this.label22);
 			this.groupBox2.Controls.Add(this.ObjectLockNoRadioButton);
 			this.groupBox2.Controls.Add(this.ObjectLockYesRadioButton);
-			this.groupBox2.Location = new System.Drawing.Point(1018, 950);
+			this.groupBox2.Location = new System.Drawing.Point(14, 772);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(274, 41);
 			this.groupBox2.TabIndex = 49;
@@ -768,6 +771,7 @@ partial class Form1
 			// ObjectLockNoRadioButton
 			// 
 			this.ObjectLockNoRadioButton.AutoSize = true;
+			this.ObjectLockNoRadioButton.Checked = true;
 			this.ObjectLockNoRadioButton.Location = new System.Drawing.Point(195, 13);
 			this.ObjectLockNoRadioButton.Name = "ObjectLockNoRadioButton";
 			this.ObjectLockNoRadioButton.Size = new System.Drawing.Size(50, 24);
@@ -787,11 +791,47 @@ partial class Form1
 			this.ObjectLockYesRadioButton.Text = "Yes";
 			this.ObjectLockYesRadioButton.UseVisualStyleBackColor = true;
 			// 
+			// MovementSpeedControl
+			// 
+			this.MovementSpeedControl.DecimalPlaces = 1;
+			this.MovementSpeedControl.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+			this.MovementSpeedControl.Location = new System.Drawing.Point(180, 838);
+			this.MovementSpeedControl.Maximum = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+			this.MovementSpeedControl.Name = "MovementSpeedControl";
+			this.MovementSpeedControl.Size = new System.Drawing.Size(107, 27);
+			this.MovementSpeedControl.TabIndex = 50;
+			this.MovementSpeedControl.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.MovementSpeedControl.ValueChanged += new System.EventHandler(this.MovementSpeedControl_ValueChanged);
+			// 
+			// label23
+			// 
+			this.label23.AutoSize = true;
+			this.label23.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.label23.Location = new System.Drawing.Point(12, 838);
+			this.label23.Name = "label23";
+			this.label23.Size = new System.Drawing.Size(146, 23);
+			this.label23.TabIndex = 51;
+			this.label23.Text = "Movement speed:";
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(1305, 1011);
+			this.Controls.Add(this.label23);
+			this.Controls.Add(this.MovementSpeedControl);
 			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.label17);
@@ -839,9 +879,11 @@ partial class Form1
 			this.Controls.Add(this.CameraY);
 			this.Controls.Add(this.RenderObjectsList);
 			this.Controls.Add(this.DrawField);
+			this.KeyPreview = true;
 			this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
 			this.Name = "Form1";
 			this.Text = "Form1";
+			this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Form1_KeyPress);
 			((System.ComponentModel.ISupportInitialize)(this.DrawField)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.CameraY)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.CameraX)).EndInit();
@@ -864,6 +906,7 @@ partial class Form1
 			this.groupBox1.PerformLayout();
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox2.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.MovementSpeedControl)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -917,7 +960,7 @@ partial class Form1
 	private NumericUpDown ObjectScaleX;
 	private NumericUpDown ObjectScaleZ;
 	private NumericUpDown ObjectScaleY;
-	private RadioButton UseCameraRadioButtion;
+	private RadioButton UseCameraRadioButton;
 	private RadioButton UseObjectRadioButton;
 	private Label label21;
 	private GroupBox groupBox1;
@@ -925,4 +968,6 @@ partial class Form1
 	private Label label22;
 	private RadioButton ObjectLockNoRadioButton;
 	private RadioButton ObjectLockYesRadioButton;
+	private NumericUpDown MovementSpeedControl;
+	private Label label23;
 }

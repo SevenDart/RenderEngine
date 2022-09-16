@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Text.RegularExpressions;
 using RenderEngine;
 using RenderEngine.Models;
 using RenderEngine.Utilities;
@@ -11,12 +12,16 @@ public partial class Form1 : Form
     private readonly Scene _scene;
     private readonly Renderer _renderer;
     private readonly IFileParser _fileParser;
+    private readonly KeyboardController _keyboardController;
+
+    private bool _useCamera = true;
 
     public Form1()
     {
         InitializeComponent();
 
         _fileParser = new ObjFileParser();
+        _keyboardController = new KeyboardController();
 
         _scene = new Scene
         {
@@ -118,13 +123,67 @@ public partial class Form1 : Form
         ObjectScaleZ.Value = (decimal)renderObject.Scale.Z;
     }
 
-    private void UseCameraRadioButtion_CheckedChanged(object sender, EventArgs e)
-    {
-
-    }
-
     private void UseObjectRadioButton_CheckedChanged(object sender, EventArgs e)
     {
+        _useCamera = !UseObjectRadioButton.Checked;
+    }
 
+    private void UseCameraRadioButton_CheckedChanged(object sender, EventArgs e)
+    {
+        _useCamera = UseCameraRadioButton.Checked;
+    }
+
+    private void Form1_KeyPress(object sender, KeyPressEventArgs e)
+    {
+        if (!Regex.IsMatch(e.KeyChar.ToString(), $"[{_keyboardController.SupportedChars}]"))
+        {
+            return;
+        }
+
+        if (_useCamera)
+        {
+            _keyboardController.MoveObject(e.KeyChar, _scene.Camera);
+            UpdateCameraControls();
+        }
+        else
+        {
+            if (RenderObjectsList.Items.Count == 0)
+                return;
+            var renderObject = _scene.RenderObjects.First(r => r.Name == RenderObjectsList.SelectedItem.ToString());
+            
+            _keyboardController.MoveObject(e.KeyChar, renderObject);
+            UpdateCurrentObjectControls();
+        }
+        
+        _renderer.Render();
+    }
+
+    private void MovementSpeedControl_ValueChanged(object sender, EventArgs e)
+    {
+        _keyboardController.Speed = (float)MovementSpeedControl.Value;
+    }
+
+    private void UpdateCameraControls()
+    {
+        CameraX.Value = (decimal)_scene.Camera.Pivot.Center.X;
+        CameraY.Value = (decimal)_scene.Camera.Pivot.Center.Y;
+        CameraZ.Value = (decimal)_scene.Camera.Pivot.Center.Z;
+
+        CameraLeanYZ.Value = (decimal)_scene.Camera.Rotation.X;
+        CameraLeanXZ.Value = (decimal)_scene.Camera.Rotation.Y;
+        CameraLeanXY.Value = (decimal)_scene.Camera.Rotation.Z;
+    }
+    
+    private void UpdateCurrentObjectControls()
+    {
+        var renderObject = _scene.RenderObjects.First(r => r.Name == RenderObjectsList.SelectedItem.ToString());
+        
+        CurrentObjX.Value = (decimal)renderObject.Pivot.Center.X;
+        CurrentObjY.Value = (decimal)renderObject.Pivot.Center.Y;
+        CurrentObjZ.Value = (decimal)renderObject.Pivot.Center.Z;
+
+        CurrentObjLeanYZ.Value = (decimal)renderObject.Rotation.X;
+        CurrentObjLeanXZ.Value = (decimal)renderObject.Rotation.Y;
+        CurrentObjLeanXY.Value = (decimal)renderObject.Rotation.Z;
     }
 }
