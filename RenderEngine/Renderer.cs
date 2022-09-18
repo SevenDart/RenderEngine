@@ -19,40 +19,38 @@ public class Renderer
 	{
 		_drawer.Begin();
 		_drawer.Clear();
+
 		foreach (var renderObject in _scene.RenderObjects)
 		{
+			var transformationMatrix = _scene.Camera.GetFinalTransformationMatrix(renderObject.Pivot);
+			
 			foreach (var polygon in renderObject.Polygons)
 			{
-				DrawPolygon(renderObject.Pivot, polygon);
+				DrawPolygon(polygon, transformationMatrix);
 			}
 		}
+		
 		_drawer.End();
 	}
 
-	private void DrawPolygon(Pivot pivot, Polygon polygon)
+	private void DrawPolygon(Polygon polygon, Matrix4x4 transformationMatrix)
 	{
-		var previousProjection = _scene.Camera
-			.ScreenProjection(pivot.ToGlobalCoords(polygon.Vertices[0].Coordinates));
+		var previousProjection = 
+			_scene.Camera.ApplyTransformation(polygon.Vertices[0].Coordinates, transformationMatrix);
+		
 		for (var i = 1; i < polygon.Vertices.Count; i++)
 		{
-			var vertexProjection = _scene.Camera
-				.ScreenProjection(pivot.ToGlobalCoords(polygon.Vertices[i].Coordinates));
-
-			if (!float.IsNaN(vertexProjection.X) 
-			    && !float.IsNaN(vertexProjection.Y) 
-			    && !float.IsNaN(previousProjection.X) 
-			    && !float.IsNaN(previousProjection.Y))
-				_drawer.DrawLine(previousProjection, vertexProjection);
+			var vertexProjection =
+				_scene.Camera.ApplyTransformation(polygon.Vertices[i].Coordinates, transformationMatrix);
+			
+			_drawer.DrawLine(previousProjection, vertexProjection);
 
 			previousProjection = vertexProjection;
 		}
-		var firstVertexProjection = _scene.Camera
-			.ScreenProjection(pivot.ToGlobalCoords(polygon.Vertices[0].Coordinates));
-
-		if (!float.IsNaN(firstVertexProjection.X) 
-		    && !float.IsNaN(firstVertexProjection.Y) 
-		    && !float.IsNaN(previousProjection.X) 
-		    && !float.IsNaN(previousProjection.Y))
-			_drawer.DrawLine(previousProjection, firstVertexProjection);
+		
+		var firstVertexProjection = 
+			_scene.Camera.ApplyTransformation(polygon.Vertices[0].Coordinates, transformationMatrix);
+		
+		_drawer.DrawLine(previousProjection, firstVertexProjection);
 	}
 }

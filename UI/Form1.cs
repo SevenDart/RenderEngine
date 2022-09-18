@@ -31,57 +31,63 @@ public partial class Form1 : Form
                 ScreenHeight = DrawField.Height,
                 Pivot =
                 {
-                    Center = new Vector3((float)CameraX.Value, (float)CameraY.Value, (float)CameraZ.Value)
+                    Translation = new Vector3((float)CameraX.Value, (float)CameraY.Value, (float)CameraZ.Value)
                 },
-                ScreenDistance = 1 / (float)CameraScreenDist.Value,
-                ViewAngle = (int)CameraFoV.Value
+                NearPlane = 1 / (float)CameraScreenDist.Value,
+                FarPlane = (float)CameraScreenDist.Value,
+                FieldOfView = ((float)CameraFoV.Value).ToRadian()
             }
         };
 
         var drawer = new Drawer(() => 
             BufferedGraphicsManager.Current.Allocate(DrawField.CreateGraphics(), DrawField.DisplayRectangle));
+         
         _renderer = new Renderer(_scene, drawer);
     }
 
     private void SetObjectSettingsButton_Click(object sender, EventArgs e)
     {
-        if (RenderObjectsList.Items.Count == 0)
+        var renderObject = GetCurrentSelectedRenderObject();
+        if (renderObject == null)
             return;
 
-        var renderObject = _scene.RenderObjects.First(r => r.Name == RenderObjectsList.SelectedItem.ToString());
+        renderObject.Pivot.Translation = new Vector3((float)CurrentObjX.Value, (float)CurrentObjY.Value, (float)CurrentObjZ.Value);
 
-        renderObject.Pivot.Center = new Vector3((float)CurrentObjX.Value, (float)CurrentObjY.Value, (float)CurrentObjZ.Value);
-        
-        renderObject.Rotate(new Vector3(
-            (float)CurrentObjLeanYZ.Value, 
-            (float)CurrentObjLeanXZ.Value, 
-            (float)CurrentObjLeanXY.Value));
-        
-        renderObject.Scale(new Vector3(
-            (float)ObjectScaleX.Value, 
-            (float)ObjectScaleY.Value, 
-            (float)ObjectScaleZ.Value));
+        renderObject.Pivot.Rotation = new Vector3(
+            ((float)CurrentObjectYaw.Value).ToRadian(),
+            ((float)CurrentObjectPitch.Value).ToRadian(),
+            ((float)CurrentObjectRoll.Value).ToRadian());
+
+        renderObject.Pivot.Scale = new Vector3(
+            (float)ObjectScaleX.Value,
+            (float)ObjectScaleY.Value,
+            (float)ObjectScaleZ.Value);
         
         _renderer.Render();
     }
 
     private void SetCameraSettings(object sender, EventArgs e)
     {
-        _scene.Camera.Pivot.Center = new Vector3((float)CameraX.Value, (float)CameraY.Value, (float)CameraZ.Value);
-        _scene.Camera.ScreenDistance = 1 / (float)CameraScreenDist.Value;
-        _scene.Camera.ViewAngle = (int)CameraFoV.Value;
-        
-        _scene.Camera.Rotate(new Vector3((float)CameraLeanYZ.Value, (float)CameraLeanXZ.Value, (float)CameraLeanXY.Value));
+        _scene.Camera.Pivot.Translation = new Vector3((float)CameraX.Value, (float)CameraY.Value, (float)CameraZ.Value);
+        _scene.Camera.NearPlane = 1 / (float)CameraScreenDist.Value;
+        _scene.Camera.FarPlane = (float)CameraScreenDist.Value;
+        _scene.Camera.FieldOfView = ((float)CameraFoV.Value).ToRadian();
+
+        _scene.Camera.Pivot.Rotation = new Vector3(
+            ((float)CameraYaw.Value).ToRadian(),
+            ((float)CameraPitch.Value).ToRadian(),
+            ((float)CameraRoll.Value).ToRadian()
+        );
 
         _renderer.Render();
     }
 
     private void RemoveObjectButton_Click(object sender, EventArgs e)
     {
-        if (RenderObjectsList.Items.Count == 0)
+        var renderObject = GetCurrentSelectedRenderObject();
+        if (renderObject == null)
             return;
-
-        var renderObject = _scene.RenderObjects.First(r => r.Name == RenderObjectsList.SelectedItem.ToString());
+        
         _scene.RenderObjects.Remove(renderObject);
 
         RenderObjectsList.Items.Remove(renderObject.Name);
@@ -116,19 +122,21 @@ public partial class Form1 : Form
 
     private void RenderObjectsList_SelectedIndexChanged(object sender, EventArgs e)
     {
-        var renderObject = _scene.RenderObjects.First(r => r.Name == RenderObjectsList.SelectedItem.ToString());
+        var renderObject = GetCurrentSelectedRenderObject();
+        if (renderObject == null)
+            return;
 
-        CurrentObjX.Value = (decimal)renderObject.Pivot.Center.X;
-        CurrentObjY.Value = (decimal)renderObject.Pivot.Center.Y;
-        CurrentObjZ.Value = (decimal)renderObject.Pivot.Center.Z;
+        CurrentObjX.Value = (decimal)renderObject.Pivot.Translation.X;
+        CurrentObjY.Value = (decimal)renderObject.Pivot.Translation.Y;
+        CurrentObjZ.Value = (decimal)renderObject.Pivot.Translation.Z;
 
-        CurrentObjLeanYZ.Value = (decimal)renderObject.Rotation.X;
-        CurrentObjLeanXZ.Value = (decimal)renderObject.Rotation.Y;
-        CurrentObjLeanXY.Value = (decimal)renderObject.Rotation.Z;
+        CurrentObjectYaw.Value = (decimal)renderObject.Pivot.Rotation.X;
+        CurrentObjectPitch.Value = (decimal)renderObject.Pivot.Rotation.Y;
+        CurrentObjectRoll.Value = (decimal)renderObject.Pivot.Rotation.Z;
 
-        ObjectScaleX.Value = (decimal)renderObject.ScaleVector.X;
-        ObjectScaleY.Value = (decimal)renderObject.ScaleVector.Y;
-        ObjectScaleZ.Value = (decimal)renderObject.ScaleVector.Z;
+        ObjectScaleX.Value = (decimal)renderObject.Pivot.Scale.X;
+        ObjectScaleY.Value = (decimal)renderObject.Pivot.Scale.Y;
+        ObjectScaleZ.Value = (decimal)renderObject.Pivot.Scale.Z;
     }
 
     private void UseObjectRadioButton_CheckedChanged(object sender, EventArgs e)
@@ -155,9 +163,9 @@ public partial class Form1 : Form
         }
         else
         {
-            if (RenderObjectsList.Items.Count == 0)
+            var renderObject = GetCurrentSelectedRenderObject();
+            if (renderObject == null)
                 return;
-            var renderObject = _scene.RenderObjects.First(r => r.Name == RenderObjectsList.SelectedItem.ToString());
             
             _keyboardController.MoveObject(e.KeyChar, renderObject);
             UpdateCurrentObjectControls();
@@ -173,35 +181,82 @@ public partial class Form1 : Form
 
     private void UpdateCameraControls()
     {
-        CameraX.Value = (decimal)_scene.Camera.Pivot.Center.X;
-        CameraY.Value = (decimal)_scene.Camera.Pivot.Center.Y;
-        CameraZ.Value = (decimal)_scene.Camera.Pivot.Center.Z;
+        CameraX.Value = (decimal)_scene.Camera.Pivot.Translation.X;
+        CameraY.Value = (decimal)_scene.Camera.Pivot.Translation.Y;
+        CameraZ.Value = (decimal)_scene.Camera.Pivot.Translation.Z;
 
-        CameraLeanYZ.Value = (decimal)_scene.Camera.Rotation.X;
-        CameraLeanXZ.Value = (decimal)_scene.Camera.Rotation.Y;
-        CameraLeanXY.Value = (decimal)_scene.Camera.Rotation.Z;
+        CameraYaw.Value = (decimal)_scene.Camera.Pivot.Rotation.X.ToDegree();
+        CameraPitch.Value = (decimal)_scene.Camera.Pivot.Rotation.Y.ToDegree();
+        CameraRoll.Value = (decimal)_scene.Camera.Pivot.Rotation.Z.ToDegree();
     }
     
     private void UpdateCurrentObjectControls()
     {
-        var renderObject = _scene.RenderObjects.First(r => r.Name == RenderObjectsList.SelectedItem.ToString());
+        var renderObject = GetCurrentSelectedRenderObject();
+        if (renderObject == null)
+            return;
         
-        CurrentObjX.Value = (decimal)renderObject.Pivot.Center.X;
-        CurrentObjY.Value = (decimal)renderObject.Pivot.Center.Y;
-        CurrentObjZ.Value = (decimal)renderObject.Pivot.Center.Z;
-
-        CurrentObjLeanYZ.Value = (decimal)renderObject.Rotation.X;
-        CurrentObjLeanXZ.Value = (decimal)renderObject.Rotation.Y;
-        CurrentObjLeanXY.Value = (decimal)renderObject.Rotation.Z;
+        CurrentObjX.Value = (decimal)renderObject.Pivot.Translation.X;
+        CurrentObjY.Value = (decimal)renderObject.Pivot.Translation.Y;
+        CurrentObjZ.Value = (decimal)renderObject.Pivot.Translation.Z;
+        
+        CurrentObjectYaw.Value = (decimal)renderObject.Pivot.Rotation.X.ToDegree();
+        CurrentObjectPitch.Value = (decimal)renderObject.Pivot.Rotation.Y.ToDegree();
+        CurrentObjectRoll.Value = (decimal)renderObject.Pivot.Rotation.Z.ToDegree();
     }
 
-    private void DrawField_DragEnter(object sender, DragEventArgs e)
+    private Vector2? _dragPosition;
+
+    private void DrawField_MouseUp(object sender, MouseEventArgs e)
     {
-        
+        _dragPosition = null;
     }
 
-    private void DrawField_DragDrop(object sender, DragEventArgs e)
+    private void DrawField_MouseDown(object sender, MouseEventArgs e)
     {
+        _dragPosition = new Vector2(e.X, e.Y);
+    }
 
+    private void DrawField_MouseMove(object sender, MouseEventArgs e)
+    {
+        if (!_dragPosition.HasValue) 
+            return;
+
+        var currentPosition = new Vector2(e.X, e.Y);
+        var delta = (currentPosition - _dragPosition.Value) * _keyboardController.Speed;
+
+        delta.X = delta.X.ToRadian();
+        delta.Y = delta.Y.ToRadian();
+        
+        if (_useCamera)
+        {
+            _scene.Camera.Pivot.Rotation += new Vector3(delta, 0);
+            UpdateCameraControls();
+        }
+        else
+        {
+            var renderObject = GetCurrentSelectedRenderObject();
+            if (renderObject == null)
+                return;
+
+            renderObject.Pivot.Rotation += new Vector3(delta, 0);
+            UpdateCurrentObjectControls();
+        }
+
+        _dragPosition = currentPosition;
+        _renderer.Render();
+    }
+
+    private RenderObject? GetCurrentSelectedRenderObject()
+    {
+        if (RenderObjectsList.Items.Count == 0)
+            return null;
+
+        if (RenderObjectsList.SelectedIndex == -1)
+        {
+            RenderObjectsList.SelectedIndex = 0;
+        }
+        
+        return _scene.RenderObjects.First(r => r.Name == RenderObjectsList.SelectedItem.ToString());
     }
 }

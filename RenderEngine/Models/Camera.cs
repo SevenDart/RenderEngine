@@ -6,46 +6,60 @@ public class Camera: RenderObject
 {
     public int ScreenWidth { get; set; }
 	public int ScreenHeight { get; set; }
+	public float NearPlane { get; set; }
+	public float FarPlane { get; set; }
+	public float FieldOfView { get; set; }
 
-	public float ScreenDistance { get; set; }
+	private const float AspectRatio = 16.0f / 9;
 
-    public float ViewAngle { get; set; }
-
-    public Camera(Vector3 position)
+	public Camera(Vector3 position)
     {
-        Pivot = new Pivot()
-        {
-            Center = position
-		};
+        Pivot = new Pivot { Translation = position };
     }
 
-    public Vector2 ScreenProjection(Vector3 vertex)
+	public Vector2 ScreenProjection(Vector3 vertex, Pivot objectPivot)
     {
-        var localCoordinates = Pivot.ToLocalCoords(vertex);
+	    var viewportMatrix = GetToScreenMatrix();
+	    var projectionMatrix = GetScreenProjectionMatrix();
+	    var viewMatrix = Pivot.CreateCameraMatrix();
+	    var modelMatrix = objectPivot.CreateModelMatrix();
+	    
+	    var resultMatrix = modelMatrix * viewMatrix * projectionMatrix * viewportMatrix;
+	    
+        var projection = Vector4.Transform(vertex, resultMatrix);
 
-        if (localCoordinates.Z < ScreenDistance)
-        {
-			return new Vector2(float.NaN, float.NaN);
-		}
+        return new Vector2(projection.X / projection.W, projection.Y / projection.W);
+    }
 
-		var delta = (ScreenDistance / localCoordinates.Z) * ScreenWidth 
-		            / (float)(2 * ScreenDistance * Math.Tan(ViewAngle * Math.PI / 360));
-
-		var projection = new Vector2(localCoordinates.X, localCoordinates.Y) * delta;
-        
-        projection = ToScreenCoordinates(projection);
-        if (projection.X > 0 && projection.X < ScreenWidth 
-            && projection.Y > 0 && projection.Y < ScreenHeight)
-        {
-            return projection;
-        }
-
-        return new Vector2(float.NaN, float.NaN);
-	}
-
-    private Vector2 ToScreenCoordinates(Vector2 v)
+	public Vector2 ApplyTransformation(Vector3 vertex, Matrix4x4 matrix)
 	{
-		v += new Vector2(ScreenWidth / 2.0f, -ScreenHeight / 2.0f);
-        return v with { Y = -v.Y };
+		var projection = Vector4.Transform(vertex, matrix);
+
+		return new Vector2(projection.X / projection.W, projection.Y / projection.W);
 	}
+
+	public Matrix4x4 GetFinalTransformationMatrix(Pivot objectPivot)
+	{
+		var modelMatrix = objectPivot.CreateModelMatrix();
+		var viewMatrix = Pivot.CreateCameraMatrix();
+		var projectionMatrix = GetScreenProjectionMatrix();
+		var viewportMatrix = GetToScreenMatrix();
+
+		return modelMatrix * viewMatrix * projectionMatrix * viewportMatrix;
+	}
+
+    private Matrix4x4 GetToScreenMatrix()
+    {
+	    return new Matrix4x4(
+		    (ScreenWidth / 2.0f), 0, 0, 0,
+		    0, (-ScreenHeight / 2.0f), 0, 0,
+		    0, 0, 1, 0,
+		    ScreenWidth / 2.0f, ScreenHeight / 2.0f, 0, 1
+	    );
+    }
+    
+    private Matrix4x4 GetScreenProjectionMatrix()
+    {
+	    return Matrix4x4.CreatePerspectiveFieldOfView(FieldOfView, AspectRatio, NearPlane, FarPlane);
+    }
 }

@@ -22,7 +22,7 @@ public class KeyboardController
     public void MoveObject(char keyPressed, RenderObject renderObject)
     {
         var directionVector = _keysMap[keyPressed];
-        
-        renderObject.Move(directionVector);
+
+        renderObject.Pivot.Translation += directionVector * Speed;
     }
 }

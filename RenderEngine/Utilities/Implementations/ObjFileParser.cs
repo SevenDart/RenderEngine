@@ -28,7 +28,7 @@ public class ObjFileParser : IFileParser
 			Name = Path.GetFileName(filepath),
 			Pivot = new Pivot()
 			{
-				Center = new Vector3(0, 0, 0)
+				Translation = new Vector3(0, 0, 0)
 			}
 		};
 
@@ -135,7 +135,7 @@ public class ObjFileParser : IFileParser
 	{
 		var pivot = new Pivot
 		{
-			Center = new Vector3()
+			Translation = new Vector3()
 			{
 				X = _vertices.Sum(v => v.Coordinates.X) / _vertices.Count,
 				Y = _vertices.Sum(v => v.Coordinates.Y) / _vertices.Count,
