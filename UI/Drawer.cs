@@ -20,7 +20,7 @@ public class Drawer: IDrawer
     {
         _bufferedGraphics = _allocateBufferedGraphics();
     }
-    
+
     public void DrawLine(Vector2 point1, Vector2 point2)
     {
         _bufferedGraphics!.Graphics.DrawLine(_pen, point1.X, point1.Y, point2.X, point2.Y);
