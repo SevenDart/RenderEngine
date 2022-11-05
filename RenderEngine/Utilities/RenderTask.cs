@@ -5,9 +5,9 @@ namespace RenderEngine.Utilities;
 public class RenderTask
 {
     public Polygon Polygon;
-    public TransformationMatrixBox MatrixBox;
+    public MatrixBox MatrixBox;
 
-    public RenderTask(Polygon polygon, TransformationMatrixBox matrixBox)
+    public RenderTask(Polygon polygon, MatrixBox matrixBox)
     {
         Polygon = polygon;
         MatrixBox = matrixBox;

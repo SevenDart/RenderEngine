@@ -23,7 +23,7 @@ public class Renderer
 		{
 			foreach (var renderObject in _scene.RenderObjects)
 			{
-				var matrixBox = new TransformationMatrixBox(_scene.Camera.GetFinalTransformationMatrix(renderObject.Pivot));
+				var matrixBox = new MatrixBox(_scene.Camera.GetFinalTransformationMatrix(renderObject.Pivot));
 				
 				foreach (var polygon in renderObject.Polygons)
 				{

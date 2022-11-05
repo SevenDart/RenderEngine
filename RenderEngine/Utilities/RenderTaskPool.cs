@@ -15,7 +15,7 @@ public static class RenderTaskPool
         AvailableTasksQueue = new Queue<RenderTask>(8196);
     }
 
-    public static RenderTask GetTask(Polygon polygon, TransformationMatrixBox renderMatrix)
+    public static RenderTask GetTask(Polygon polygon, MatrixBox renderMatrix)
     {
         RenderTask? availableTask;
         lock (_listLock)
