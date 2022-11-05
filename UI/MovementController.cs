@@ -54,7 +54,7 @@ public class MovementController
         directionState.Active = false;
     }
 
-    public void MovementKeyPressed()
+    public bool MovementKeyPressed()
     {
         if (ControlCamera)
         {
@@ -64,10 +64,12 @@ public class MovementController
         {
             var renderObject = _getCurrentRenderObject();
             if (renderObject == null)
-                return;
+                return false;
 
             MoveObject(renderObject);
         }
+
+        return true;
     }
 
     public void MouseDown(Vector2 currentPoint)
@@ -75,10 +77,10 @@ public class MovementController
         _dragPosition = currentPoint;
     }
 
-    public void MouseMove(Vector2 currentPoint)
+    public bool MouseMove(Vector2 currentPoint)
     {
         if (!_dragPosition.HasValue)
-            return;
+            return false;
 
         var delta = (currentPoint - _dragPosition.Value) * MouseRotationSpeed;
 
@@ -93,12 +95,13 @@ public class MovementController
         {
             var renderObject = _getCurrentRenderObject();
             if (renderObject == null)
-                return;
+                return false;
 
             renderObject.Pivot.Rotation += new Vector3(delta, 0);
         }
 
         _dragPosition = currentPoint;
+        return true;
     }
 
     public void MouseUp()
@@ -112,6 +115,15 @@ public class MovementController
             .Where(ds => ds.Active)
             .Aggregate(Vector3.Zero,
                 (current, directionState) => current + directionState.Direction);
+
+        if (ControlCamera)
+        {
+            var cameraRotation = Matrix4x4.CreateFromYawPitchRoll(renderObject.Pivot.Rotation.X,
+                renderObject.Pivot.Rotation.Y, renderObject.Pivot.Rotation.Z);
+            translationVector = Vector3.Transform(translationVector, cameraRotation);
+
+            //translationVector.X = -translationVector.X;
+        }
 
         renderObject.Pivot.Translation += translationVector * MovementSpeed;
     }

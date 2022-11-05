@@ -10,32 +10,27 @@ public class Camera: RenderObject
 	public float FarPlane { get; set; }
 	public float FieldOfView { get; set; }
 
-	private const float AspectRatio = 16.0f / 9;
+	private float AspectRatio => (float)ScreenWidth / ScreenHeight;
 
 	public Camera(Vector3 position)
     {
         Pivot = new Pivot { Translation = position };
     }
 
-	public Vector2 ScreenProjection(Vector3 vertex, Pivot objectPivot)
-    {
-	    var viewportMatrix = GetToScreenMatrix();
-	    var projectionMatrix = GetScreenProjectionMatrix();
-	    var viewMatrix = Pivot.CreateCameraMatrix();
-	    var modelMatrix = objectPivot.CreateModelMatrix();
-	    
-	    var resultMatrix = modelMatrix * viewMatrix * projectionMatrix * viewportMatrix;
-	    
-        var projection = Vector4.Transform(vertex, resultMatrix);
-
-        return new Vector2(projection.X / projection.W, projection.Y / projection.W);
-    }
-
-	public Vector2 ApplyTransformation(Vector3 vertex, Matrix4x4 matrix)
+	public Vector2 GetScreenPointProjection(Vector3 vertex, Matrix4x4 matrix)
 	{
 		var projection = Vector4.Transform(vertex, matrix);
 
-		return new Vector2(projection.X / projection.W, projection.Y / projection.W);
+		if (projection.W < NearPlane || projection.Z > FarPlane)
+			return new Vector2(float.NaN, float.NaN);
+		
+		var screenProjection = new Vector2(projection.X / projection.W, projection.Y / projection.W);
+		
+		if ((screenProjection.X < 0 || screenProjection.X > ScreenWidth) 
+		    || (screenProjection.Y < 0 || screenProjection.Y > ScreenHeight))
+			return new Vector2(float.NaN, float.NaN);
+
+		return screenProjection;
 	}
 
 	public Matrix4x4 GetFinalTransformationMatrix(Pivot objectPivot)

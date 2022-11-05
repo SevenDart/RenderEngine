@@ -36,7 +36,8 @@ public partial class Form1 : Form
         _fileParser = new ObjFileParser();
         _movementController = new MovementController(_scene.Camera, GetCurrentSelectedRenderObject);
         var drawer = new Drawer(() =>
-            BufferedGraphicsManager.Current.Allocate(DrawField.CreateGraphics(), DrawField.DisplayRectangle));
+            BufferedGraphicsManager.Current.Allocate(DrawField.CreateGraphics(), DrawField.DisplayRectangle),
+            DrawField.Width, DrawField.Height);
 
         _renderer = new Renderer(_scene, drawer);
     }
@@ -178,7 +179,8 @@ public partial class Form1 : Form
         if (!_movementController.AccessibleKeyChars.Contains(e.KeyChar))
             return;
 
-        _movementController.MovementKeyPressed();
+        if (!_movementController.MovementKeyPressed())
+            return;
 
         UpdateCameraControls();
         UpdateCurrentObjectControls();
@@ -203,8 +205,9 @@ public partial class Form1 : Form
 
     private void DrawField_MouseMove(object sender, MouseEventArgs e)
     {
-        _movementController.MouseMove(new Vector2(e.X, e.Y));
-
+        if (!_movementController.MouseMove(new Vector2(e.X, e.Y))) 
+            return;
+        
         UpdateCurrentObjectControls();
         UpdateCameraControls();
         _renderer.Render();

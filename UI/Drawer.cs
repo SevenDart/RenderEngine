@@ -1,39 +1,23 @@
-﻿using System.Numerics;
-using RenderEngine.Interfaces;
+﻿using RenderEngine.Interfaces;
 
 namespace UI;
 
 public class Drawer: IDrawer
 {
-    private readonly Pen _pen;
-    private BufferedGraphics? _bufferedGraphics;
-
     private readonly Func<BufferedGraphics> _allocateBufferedGraphics;
+    
+    private readonly int _width;
+    private readonly int _height;
 
-    public Drawer(Func<BufferedGraphics> allocateBufferedGraphics)
+    public Drawer(Func<BufferedGraphics> allocateBufferedGraphics, int width, int height)
     {
         _allocateBufferedGraphics = allocateBufferedGraphics;
-        _pen = new Pen(Color.Black);
+        _width = width;
+        _height = height;
     }
 
-    public void Begin()
+    public ICustomGraphics GetGraphics()
     {
-        _bufferedGraphics = _allocateBufferedGraphics();
-    }
-
-    public void DrawLine(Vector2 point1, Vector2 point2)
-    {
-        _bufferedGraphics!.Graphics.DrawLine(_pen, point1.X, point1.Y, point2.X, point2.Y);
-    }
-
-    public void Clear()
-    {
-        _bufferedGraphics!.Graphics.Clear(Color.White);
-    }
-
-    public void End()
-    {
-        _bufferedGraphics!.Render();
-        _bufferedGraphics.Dispose();
+        return new CustomGraphics(_width, _height, _allocateBufferedGraphics());
     }
 }

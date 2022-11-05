@@ -1,6 +1,6 @@
-﻿using System.Numerics;
-using RenderEngine.Interfaces;
+﻿using RenderEngine.Interfaces;
 using RenderEngine.Models;
+using RenderEngine.Utilities;
 
 namespace RenderEngine;
 
@@ -8,7 +8,9 @@ public class Renderer
 {
 	private readonly IDrawer _drawer;
 	private readonly Scene _scene;
-	
+	private ICustomGraphics _graphics = null!;
+	private Logger _logger = new Logger();
+
 	public Renderer(Scene scene, IDrawer drawer)
 	{
 		_scene = scene;
@@ -17,40 +19,45 @@ public class Renderer
 
 	public void Render()
 	{
-		_drawer.Begin();
-		_drawer.Clear();
-
-		foreach (var renderObject in _scene.RenderObjects)
+		using (_graphics = _drawer.GetGraphics())
 		{
-			var transformationMatrix = _scene.Camera.GetFinalTransformationMatrix(renderObject.Pivot);
-			
-			foreach (var polygon in renderObject.Polygons)
+			foreach (var renderObject in _scene.RenderObjects)
 			{
-				DrawPolygon(polygon, transformationMatrix);
+				var matrixBox = new TransformationMatrixBox(_scene.Camera.GetFinalTransformationMatrix(renderObject.Pivot));
+				
+				foreach (var polygon in renderObject.Polygons)
+				{
+					var renderTask = RenderTaskPool.GetTask(polygon, matrixBox);
+					ThreadPool.QueueUserWorkItem(DrawPolygon, renderTask, true);
+				}
 			}
+			
+			RenderTaskPool.WaitUntilAllFinished();
+			_graphics.Render();
 		}
-		
-		_drawer.End();
 	}
 
-	private void DrawPolygon(Polygon polygon, Matrix4x4 transformationMatrix)
+	private void DrawPolygon(RenderTask renderTask)
 	{
-		var previousProjection = 
-			_scene.Camera.ApplyTransformation(polygon.Vertices[0].Coordinates, transformationMatrix);
-		
-		for (var i = 1; i < polygon.Vertices.Count; i++)
+		var firstVertexProjection =
+			_scene.Camera.GetScreenPointProjection(renderTask.Polygon.Vertices[0].Coordinates, renderTask.MatrixBox.Matrix);
+
+		var previousProjection = firstVertexProjection;
+
+		for (var i = 1; i < renderTask.Polygon.Vertices.Count; i++)
 		{
 			var vertexProjection =
-				_scene.Camera.ApplyTransformation(polygon.Vertices[i].Coordinates, transformationMatrix);
-			
-			_drawer.DrawLine(previousProjection, vertexProjection);
+				_scene.Camera.GetScreenPointProjection(renderTask.Polygon.Vertices[i].Coordinates, renderTask.MatrixBox.Matrix);
+
+			if (!float.IsNaN(vertexProjection.X) && !float.IsNaN(previousProjection.X))
+				_graphics.DrawLine(previousProjection, vertexProjection);
 
 			previousProjection = vertexProjection;
 		}
+
+		if (!float.IsNaN(firstVertexProjection.X) && !float.IsNaN(previousProjection.X))
+			_graphics.DrawLine(previousProjection, firstVertexProjection);
 		
-		var firstVertexProjection = 
-			_scene.Camera.ApplyTransformation(polygon.Vertices[0].Coordinates, transformationMatrix);
-		
-		_drawer.DrawLine(previousProjection, firstVertexProjection);
+		renderTask.Finish();
 	}
 }
