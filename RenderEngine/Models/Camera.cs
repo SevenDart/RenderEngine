@@ -57,4 +57,13 @@ public class Camera: RenderObject
     {
 	    return Matrix4x4.CreatePerspectiveFieldOfView(FieldOfView, AspectRatio, NearPlane, FarPlane);
     }
+
+    public override void Move(Vector3 translationVector)
+    {
+	    var cameraRotation = Matrix4x4.CreateFromYawPitchRoll(Pivot.Rotation.X,
+		    Pivot.Rotation.Y, Pivot.Rotation.Z);
+	    translationVector = Vector3.Transform(translationVector, cameraRotation); 
+	    
+	    base.Move(translationVector);
+    }
 }

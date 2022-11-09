@@ -19,7 +19,7 @@ public class Pivot
     public Matrix4x4 CreateCameraMatrix()
     {
         var rotationMatrix = Matrix4x4.CreateFromYawPitchRoll(Rotation.X, Rotation.Y, Rotation.Z);
-        var translationMatrix = Matrix4x4.CreateTranslation(-Translation.X, Translation.Y, Translation.Z);
+        var translationMatrix = Matrix4x4.CreateTranslation(-Translation.X, -Translation.Y, Translation.Z);
         return translationMatrix * rotationMatrix;
     }
 }

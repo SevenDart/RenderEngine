@@ -116,16 +116,7 @@ public class MovementController
             .Aggregate(Vector3.Zero,
                 (current, directionState) => current + directionState.Direction);
 
-        if (ControlCamera)
-        {
-            var cameraRotation = Matrix4x4.CreateFromYawPitchRoll(renderObject.Pivot.Rotation.X,
-                renderObject.Pivot.Rotation.Y, renderObject.Pivot.Rotation.Z);
-            translationVector = Vector3.Transform(translationVector, cameraRotation);
-
-            //translationVector.X = -translationVector.X;
-        }
-
-        renderObject.Pivot.Translation += translationVector * MovementSpeed;
+        renderObject.Move(translationVector * MovementSpeed);
     }
 
     class DirectionState
