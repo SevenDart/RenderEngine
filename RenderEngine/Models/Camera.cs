@@ -25,11 +25,6 @@ public class Camera: RenderObject
 			return new Vector2(float.NaN, float.NaN);
 		
 		var screenProjection = new Vector2(projection.X / projection.W, projection.Y / projection.W);
-		
-		if ((screenProjection.X < 0 || screenProjection.X > ScreenWidth) 
-		    || (screenProjection.Y < 0 || screenProjection.Y > ScreenHeight))
-			return new Vector2(float.NaN, float.NaN);
-
 		return screenProjection;
 	}
 
