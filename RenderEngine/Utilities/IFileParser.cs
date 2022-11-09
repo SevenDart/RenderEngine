@@ -10,5 +10,5 @@ public interface IFileParser
 	Vertex ParseVertex(string[] inputValues);
 	Vector3 ParseTextureCoordinates(string[] inputValues);
 	Vector3 ParseNormalVector(string[] inputValues);
-	Polygon ParsePolygon(string[] inputValues);
+	IEnumerable<Polygon> ParseTriangulatedPolygon(string[] inputValues);
 }

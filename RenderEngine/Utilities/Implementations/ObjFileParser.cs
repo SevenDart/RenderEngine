@@ -63,8 +63,8 @@ public class ObjFileParser : IFileParser
 				_vertexNormals.Add(normalVector);
 				break;
 			case "f":
-				var polygon = ParsePolygon(inputValues);
-				_polygons.Add(polygon);
+				var polygons = ParseTriangulatedPolygon(inputValues);
+				_polygons.AddRange(polygons);
 				break;
 		}
 	}
@@ -99,10 +99,9 @@ public class ObjFileParser : IFileParser
 		return new Vector3(float.Parse(inputValues[0]), float.Parse(inputValues[1]), float.Parse(inputValues[2]));
 	}
 
-	public Polygon ParsePolygon(string[] inputValues)
+	public IEnumerable<Polygon> ParseTriangulatedPolygon(string[] inputValues)
 	{
-		var polygon = new Polygon();
-
+		var vertices = new List<Vertex>();
 		foreach (var inputValue in inputValues)
 		{
 			var vertexValues = inputValue.Split('/');
@@ -125,25 +124,52 @@ public class ObjFileParser : IFileParser
 				index = index < 0 ? _vertexNormals.Count - Math.Abs(index) : index - 1;
 				vertex.NormalVector = _vertexNormals[index];
 			}
-			polygon.Vertices.Add(vertex);
+			vertices.Add(vertex);
 		}
 
-		return polygon;
+		return TriangulatePolygon(vertices.ToArray());
 	}
 
-	private Pivot GetPivot()
-	{
-		var pivot = new Pivot
-		{
-			Translation = new Vector3()
-			{
-				X = _vertices.Sum(v => v.Coordinates.X) / _vertices.Count,
-				Y = _vertices.Sum(v => v.Coordinates.Y) / _vertices.Count,
-				Z = _vertices.Sum(v => v.Coordinates.Z) / _vertices.Count
-			}
-		};
 
-		return pivot;
+	private IEnumerable<Polygon> TriangulatePolygon(Vertex[] vertices)
+	{
+		if (vertices.Length == 3)
+		{
+			return new Polygon[]
+			{
+				new() { Vertices = vertices.ToList() }
+			};
+		}
+		
+		var polygons = new List<Polygon>();
+
+		var innerVertices = new List<Vertex>();
+
+		int index = 2;
+		for (; index < vertices.Length; index += 2)
+		{
+			if (index % 2 == 0)
+			{
+				innerVertices.Add(vertices[index]);
+				polygons.Add(new Polygon() { 
+					Vertices = new List<Vertex> {
+						vertices[index - 2],
+						vertices[index - 1],
+						vertices[index]
+					} 
+				});
+			}
+		}
+
+
+		if (vertices.Length % 2 == 0)
+		{
+			innerVertices.Add(vertices[^1]);
+		}
+		innerVertices.Add(vertices[0]);
+			
+		polygons.AddRange(TriangulatePolygon(innerVertices.ToArray()));
+		return polygons;
 	}
 
 	private void ClearData()
