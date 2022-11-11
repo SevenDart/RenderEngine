@@ -1,9 +1,13 @@
-﻿using System.Numerics;
+﻿using System.Drawing;
+using System.Numerics;
+using RenderEngine.Models;
 
 namespace RenderEngine.Interfaces;
 
 public interface ICustomGraphics: IDisposable
 {
-    void DrawLine(Vector2 point1, Vector2 point2);
+    void FillPolygon(Vector3[] vertexProjections, Color color);
+    void DrawPoint(Vector3 point, Color color);
+    void DrawLine(Vector3 point1, Vector3 point2, Color color);
     void Render();
 }

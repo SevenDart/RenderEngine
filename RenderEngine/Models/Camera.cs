@@ -17,14 +17,14 @@ public class Camera: RenderObject
         Pivot = new Pivot { Translation = position };
     }
 
-	public Vector2 GetScreenPointProjection(Vector3 vertex, Matrix4x4 matrix)
+	public Vector3 GetScreenPointProjection(Vector3 vertex, Matrix4x4 matrix)
 	{
 		var projection = Vector4.Transform(vertex, matrix);
 
 		if (projection.W < NearPlane || projection.Z > FarPlane)
-			return new Vector2(float.NaN, float.NaN);
+			return new Vector3(float.NaN, float.NaN, float.NaN);
 		
-		var screenProjection = new Vector2(projection.X / projection.W, projection.Y / projection.W);
+		var screenProjection = new Vector3(projection.X / projection.W, projection.Y / projection.W, -projection.Z);
 		return screenProjection;
 	}
 

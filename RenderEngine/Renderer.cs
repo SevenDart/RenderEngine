@@ -1,6 +1,9 @@
-﻿using RenderEngine.Interfaces;
+﻿using System.Drawing;
+using System.Numerics;
+using RenderEngine.Interfaces;
 using RenderEngine.Models;
 using RenderEngine.Utilities;
+using RenderEngine.Utilities.Pools;
 
 namespace RenderEngine;
 
@@ -10,6 +13,8 @@ public class Renderer
 	private readonly Scene _scene;
 	private ICustomGraphics _graphics = null!;
 	private Logger _logger = new Logger();
+
+	private static Random _random = new();
 
 	public Renderer(Scene scene, IDrawer drawer)
 	{
@@ -28,6 +33,7 @@ public class Renderer
 				foreach (var polygon in renderObject.Polygons)
 				{
 					var renderTask = RenderTaskPool.GetTask(polygon, matrixBox);
+					//DrawPolygon(renderTask);
 					ThreadPool.QueueUserWorkItem(DrawPolygon, renderTask, true);
 				}
 			}
@@ -39,25 +45,31 @@ public class Renderer
 
 	private void DrawPolygon(RenderTask renderTask)
 	{
-		var firstVertexProjection =
-			_scene.Camera.GetScreenPointProjection(renderTask.Polygon.Vertices[0].Coordinates, renderTask.MatrixBox.Matrix);
+		var vertexProjections = VectorArrayPool.GetVectorArray(3);
 
-		var previousProjection = firstVertexProjection;
-
-		for (var i = 1; i < renderTask.Polygon.Vertices.Count; i++)
+		for (var i = 0; i < renderTask.Polygon.Vertices.Count; i++)
 		{
-			var vertexProjection =
-				_scene.Camera.GetScreenPointProjection(renderTask.Polygon.Vertices[i].Coordinates, renderTask.MatrixBox.Matrix);
-
-			if (!float.IsNaN(vertexProjection.X) && !float.IsNaN(previousProjection.X))
-				_graphics.DrawLine(previousProjection, vertexProjection);
-
-			previousProjection = vertexProjection;
+			vertexProjections[i] = _scene.Camera.GetScreenPointProjection(renderTask.Polygon.Vertices[i].Coordinates, renderTask.MatrixBox.Matrix);
+			if (float.IsNaN(vertexProjections[i].X) || float.IsNaN(vertexProjections[i].Y))
+			{
+				VectorArrayPool.ReturnToAvailable(vertexProjections);
+				renderTask.Finish();
+				return;
+			}
 		}
 
-		if (!float.IsNaN(firstVertexProjection.X) && !float.IsNaN(previousProjection.X))
-			_graphics.DrawLine(previousProjection, firstVertexProjection);
+		_graphics.FillPolygon(vertexProjections, Color.FromArgb(255, _random.Next(255), _random.Next(255), _random.Next(255)));
+
+		// for (var i = 1; i < renderTask.Polygon.Vertices.Count; i++)
+		// {
+		// 	if (!float.IsNaN(vertexProjections[i].X) && !float.IsNaN(vertexProjections[i - 1].X))
+		// 		_graphics.DrawLine(vertexProjections[i], vertexProjections[i - 1], Color.Black);
+		// }
+		//
+		// if (!float.IsNaN(vertexProjections[^1].X) && !float.IsNaN(vertexProjections[0].X))
+		// 	_graphics.DrawLine(vertexProjections[^1], vertexProjections[0], Color.Black);
 		
+		VectorArrayPool.ReturnToAvailable(vertexProjections);
 		renderTask.Finish();
 	}
 }

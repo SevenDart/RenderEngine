@@ -1,27 +1,21 @@
-﻿using System.Numerics;
+﻿using System.Collections.Concurrent;
 using RenderEngine.Models;
 
-namespace RenderEngine.Utilities;
+namespace RenderEngine.Utilities.Pools;
 
 public static class RenderTaskPool
 {
     public static int TaskCount = 0;
-    private static readonly Queue<RenderTask> AvailableTasksQueue;
-    
-    private static object _listLock = new();
+    private static readonly ConcurrentQueue<RenderTask> AvailableTasksQueue;
 
     static RenderTaskPool()
     {
-        AvailableTasksQueue = new Queue<RenderTask>(8196);
+        AvailableTasksQueue = new ConcurrentQueue<RenderTask>();
     }
 
     public static RenderTask GetTask(Polygon polygon, MatrixBox renderMatrix)
     {
-        RenderTask? availableTask;
-        lock (_listLock)
-        {
-            AvailableTasksQueue.TryDequeue(out availableTask);
-        }
+        AvailableTasksQueue.TryDequeue(out var availableTask);
 
         if (availableTask == null)
         {
@@ -39,10 +33,7 @@ public static class RenderTaskPool
 
     public static void ReturnToAvailable(RenderTask renderTask)
     {
-        lock (_listLock)
-        {
-            AvailableTasksQueue.Enqueue(renderTask);
-        }
+        AvailableTasksQueue.Enqueue(renderTask);
         Interlocked.Decrement(ref TaskCount);
     }
     
