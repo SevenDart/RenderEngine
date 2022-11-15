@@ -65,6 +65,6 @@ public class Camera: RenderObject
     
     public override void RefreshTransformationMatrix()
     {
-	    TransformationMatrix = new MatrixBox(Pivot.CreateCameraMatrix());
+	    TransformationMatrix = new MatrixBox(Pivot.CreateModelMatrix());
     }
 }

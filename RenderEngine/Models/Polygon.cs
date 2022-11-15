@@ -13,7 +13,7 @@ public class Polygon
 		var firstPoint = Vector3.Transform(Vertices[1].Coordinates, transformMatrix.Matrix);
 		var secondPoint = Vector3.Transform(Vertices[2].Coordinates, transformMatrix.Matrix);
 		
-		return Vector3.Normalize(-Vector3.Cross(
+		return Vector3.Normalize(Vector3.Cross(
 			firstPoint - zeroPoint,
 			secondPoint - zeroPoint));
 	}
