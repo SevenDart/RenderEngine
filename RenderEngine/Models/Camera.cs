@@ -21,10 +21,10 @@ public class Camera: RenderObject
 	{
 		var projection = Vector4.Transform(vertex, matrix);
 
-		if (projection.W < NearPlane || projection.Z > FarPlane)
+		if (projection.Z < NearPlane || projection.Z > FarPlane)
 			return new Vector3(float.NaN, float.NaN, float.NaN);
 		
-		var screenProjection = new Vector3(projection.X / projection.W, projection.Y / projection.W, -projection.Z);
+		var screenProjection = new Vector3(projection.X / projection.W, projection.Y / projection.W, projection.Z);
 		return screenProjection;
 	}
 

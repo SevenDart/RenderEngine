@@ -50,7 +50,7 @@ public class Renderer
 		for (var i = 0; i < renderTask.Polygon.Vertices.Count; i++)
 		{
 			vertexProjections[i] = _scene.Camera.GetScreenPointProjection(renderTask.Polygon.Vertices[i].Coordinates, renderTask.MatrixBox.Matrix);
-			if (float.IsNaN(vertexProjections[i].X) || float.IsNaN(vertexProjections[i].Y))
+			if (float.IsNaN(vertexProjections[i].X) || float.IsNaN(vertexProjections[i].Y) || float.IsNaN(vertexProjections[i].Z))
 			{
 				VectorArrayPool.ReturnToAvailable(vertexProjections);
 				renderTask.Finish();
@@ -58,17 +58,14 @@ public class Renderer
 			}
 		}
 
-		_graphics.FillPolygon(vertexProjections, Color.FromArgb(255, _random.Next(255), _random.Next(255), _random.Next(255)));
+		var polygonNormal = renderTask.Polygon.GetNormalVector();
 
-		// for (var i = 1; i < renderTask.Polygon.Vertices.Count; i++)
-		// {
-		// 	if (!float.IsNaN(vertexProjections[i].X) && !float.IsNaN(vertexProjections[i - 1].X))
-		// 		_graphics.DrawLine(vertexProjections[i], vertexProjections[i - 1], Color.Black);
-		// }
-		//
-		// if (!float.IsNaN(vertexProjections[^1].X) && !float.IsNaN(vertexProjections[0].X))
-		// 	_graphics.DrawLine(vertexProjections[^1], vertexProjections[0], Color.Black);
+		var viewVector = Vector3.Normalize(_scene.Camera.Pivot.Translation - renderTask.Polygon.Vertices[0].Coordinates);
 		
+		var facingRatio = Math.Max(0, Vector3.Dot(polygonNormal, viewVector));
+
+		_graphics.FillPolygon(vertexProjections, Color.FromArgb(255, (int)(facingRatio * 255.0f), 0, 0));
+
 		VectorArrayPool.ReturnToAvailable(vertexProjections);
 		renderTask.Finish();
 	}

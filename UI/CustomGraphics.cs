@@ -51,6 +51,8 @@ public class CustomGraphics : ICustomGraphics
         minY = Math.Max(0, (int)Math.Ceiling(minY));
         maxX = Math.Min(_width, (int)Math.Floor(maxX));
         maxY = Math.Min(_height, (int)Math.Floor(maxY));
+
+        var triangleArea = GetBarycentricCoordinate(vertexProjections[0], vertexProjections[1], vertexProjections[2]);
         
         for (int i = (int)minX; i <= maxX; i++)
         {
@@ -62,10 +64,11 @@ public class CustomGraphics : ICustomGraphics
                     Y = GetBarycentricCoordinate(vertexProjections[1], vertexProjections[2], new Vector3(i, j, 0)),
                     Z = GetBarycentricCoordinate(vertexProjections[2], vertexProjections[0], new Vector3(i, j, 0))
                 };
+                bc /= triangleArea;
 				
                 var zCoord = 1 / (bc.X / vertexProjections[0].Z + bc.Y / vertexProjections[1].Z + bc.Z / vertexProjections[2].Z);
 
-                if (bc.X > 0 && bc.Y > 0 && bc.Z > 0)
+                if (bc.X >= 0 && bc.Y >= 0 && bc.Z >= 0 && bc.X <= 1 && bc.Y <= 1 && bc.Z <= 1)
                 {
                     DrawPoint(new Vector3(i, j, zCoord), color);
                 }
@@ -77,7 +80,7 @@ public class CustomGraphics : ICustomGraphics
     {
         if (!(point.X < 0 || point.Y < 0 || point.X >= _width || point.Y >= _height))
         {
-            if (point.Z < _depthBuffer![(int)Math.Floor(point.X), (int)Math.Floor(point.Y)])
+            if (point.Z <= _depthBuffer![(int)Math.Floor(point.X), (int)Math.Floor(point.Y)])
             {
                 _depthBuffer[(int)Math.Floor(point.X), (int)Math.Floor(point.Y)] = point.Z;
                 _bitmap[point.X, point.Y] = color;
