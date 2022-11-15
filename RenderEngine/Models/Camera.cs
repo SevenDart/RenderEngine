@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using RenderEngine.Utilities;
 
 namespace RenderEngine.Models;
 
@@ -60,5 +61,10 @@ public class Camera: RenderObject
 	    translationVector = Vector3.Transform(translationVector, cameraRotation); 
 	    
 	    base.Move(translationVector);
+    }
+    
+    public override void RefreshTransformationMatrix()
+    {
+	    TransformationMatrix = new MatrixBox(Pivot.CreateCameraMatrix());
     }
 }

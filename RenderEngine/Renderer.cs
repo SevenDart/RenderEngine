@@ -26,15 +26,19 @@ public class Renderer
 	{
 		using (_graphics = _drawer.GetGraphics())
 		{
+			_scene.Camera.RefreshTransformationMatrix();
+
 			foreach (var renderObject in _scene.RenderObjects)
 			{
-				var matrixBox = new MatrixBox(_scene.Camera.GetFinalTransformationMatrix(renderObject.Pivot));
+				renderObject.RefreshTransformationMatrix();
+				
+				var finalTransformationMatrix = new MatrixBox(_scene.Camera.GetFinalTransformationMatrix(renderObject.Pivot));
 				
 				foreach (var polygon in renderObject.Polygons)
 				{
-					var renderTask = RenderTaskPool.GetTask(polygon, matrixBox);
-					//DrawPolygon(renderTask);
-					ThreadPool.QueueUserWorkItem(DrawPolygon, renderTask, true);
+					var renderTask = RenderTaskPool.GetTask(renderObject, polygon, finalTransformationMatrix);
+					DrawPolygon(renderTask);
+					//ThreadPool.QueueUserWorkItem(DrawPolygon, renderTask, true);
 				}
 			}
 			
@@ -58,9 +62,15 @@ public class Renderer
 			}
 		}
 
-		var polygonNormal = renderTask.Polygon.GetNormalVector();
+		var polygonNormal = renderTask.Polygon.GetNormalVector(renderTask.RenderObject.TransformationMatrix);
 
-		var viewVector = Vector3.Normalize(_scene.Camera.Pivot.Translation - renderTask.Polygon.Vertices[0].Coordinates);
+		var cameraTransformedPoint =
+			Vector3.Transform(Vector3.Zero, _scene.Camera.TransformationMatrix.Matrix);
+
+		var polygonTransformedPoint =
+			Vector3.Transform(renderTask.Polygon.Vertices[0].Coordinates, renderTask.RenderObject.TransformationMatrix.Matrix);
+		
+		var viewVector = Vector3.Normalize(cameraTransformedPoint - polygonTransformedPoint);
 		
 		var facingRatio = Math.Max(0, Vector3.Dot(polygonNormal, viewVector));
 

@@ -7,11 +7,13 @@ public class RenderTask
 {
     public Polygon Polygon;
     public MatrixBox MatrixBox;
+    public RenderObject RenderObject;
 
-    public RenderTask(Polygon polygon, MatrixBox matrixBox)
+    public RenderTask(RenderObject renderObject, Polygon polygon, MatrixBox matrixBox)
     {
         Polygon = polygon;
         MatrixBox = matrixBox;
+        RenderObject = renderObject;
     }
 
     public void Finish()

@@ -1,8 +1,8 @@
 using System.Numerics;
 using RenderEngine;
+using RenderEngine.Interfaces;
 using RenderEngine.Models;
 using RenderEngine.Utilities;
-using RenderEngine.Utilities.Implementations;
 
 namespace UI;
 

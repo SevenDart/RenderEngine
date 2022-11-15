@@ -87,19 +87,14 @@ public class MovementController
         delta.X = delta.X.ToRadian();
         delta.Y = delta.Y.ToRadian();
 
-        if (ControlCamera)
-        {
-            _camera.Pivot.Rotation += new Vector3(delta, 0);
-        }
-        else
-        {
-            var renderObject = _getCurrentRenderObject();
-            if (renderObject == null)
-                return false;
+        var rotationObject = ControlCamera ? _camera : _getCurrentRenderObject();
 
-            renderObject.Pivot.Rotation += new Vector3(delta, 0);
+        if (rotationObject == null)
+        {
+            return false;
         }
 
+        rotationObject.Rotate(new Vector3(delta, 0));
         _dragPosition = currentPoint;
         return true;
     }

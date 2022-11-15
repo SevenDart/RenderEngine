@@ -1,7 +1,8 @@
 ﻿using System.Numerics;
+using RenderEngine.Interfaces;
 using RenderEngine.Models;
 
-namespace RenderEngine.Utilities.Implementations;
+namespace RenderEngine.Utilities;
 
 public class ObjFileParser : IFileParser
 {

@@ -13,16 +13,17 @@ public static class RenderTaskPool
         AvailableTasksQueue = new ConcurrentQueue<RenderTask>();
     }
 
-    public static RenderTask GetTask(Polygon polygon, MatrixBox renderMatrix)
+    public static RenderTask GetTask(RenderObject renderObject, Polygon polygon, MatrixBox renderMatrix)
     {
         AvailableTasksQueue.TryDequeue(out var availableTask);
 
         if (availableTask == null)
         {
-            availableTask = new RenderTask(polygon, renderMatrix);
+            availableTask = new RenderTask(renderObject, polygon, renderMatrix);
         }
         else
         {
+            availableTask.RenderObject = renderObject;
             availableTask.Polygon = polygon;
             availableTask.MatrixBox = renderMatrix;
         }

@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using RenderEngine.Models;
 
-namespace RenderEngine.Utilities;
+namespace RenderEngine.Interfaces;
 
 public interface IFileParser
 {
