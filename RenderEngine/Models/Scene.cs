@@ -1,14 +1,14 @@
-﻿using System.Numerics;
-
-namespace RenderEngine.Models;
+﻿namespace RenderEngine.Models;
 
 public class Scene
 {
     public Scene()
     {
-        Camera = new Camera(new Vector3(0, 0, -1));
+        Camera = new Camera();
+        LightSource = new LightSource();
     }
     
     public List<RenderObject> RenderObjects { get; set; } = new();
-    public Camera Camera { get; set; } = null!;
+    public Camera Camera { get; set; }
+    public LightSource LightSource { get; set; }
 }

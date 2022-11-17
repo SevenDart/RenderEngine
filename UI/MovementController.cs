@@ -6,16 +6,16 @@ namespace UI;
 
 public class MovementController
 {
-    private Camera _camera;
+    private Scene _scene;
     private Func<RenderObject?> _getCurrentRenderObject;
 
-    public bool ControlCamera { get; set; } = true;
+    public MovingType MovingType { get; set; }
     public float MovementSpeed { get; set; } = 0.1f;
     public float MouseRotationSpeed { get; set; } = 0.1f;
 
-    public MovementController(Camera camera, Func<RenderObject?> getCurrentRenderObject)
+    public MovementController(Scene scene, Func<RenderObject?> getCurrentRenderObject)
     {
-        _camera = camera;
+        _scene = scene;
         _getCurrentRenderObject = getCurrentRenderObject;
     }
 
@@ -56,17 +56,21 @@ public class MovementController
 
     public bool MovementKeyPressed()
     {
-        if (ControlCamera)
+        switch (MovingType)
         {
-            MoveObject(_camera);
-        }
-        else
-        {
-            var renderObject = _getCurrentRenderObject();
-            if (renderObject == null)
-                return false;
+            case MovingType.Camera:
+                MoveObject(_scene.Camera);
+                break;
+            case MovingType.LightSource:
+                MoveObject(_scene.LightSource);
+                break;
+            case MovingType.Object:
+                var renderObject = _getCurrentRenderObject();
+                if (renderObject == null)
+                    return false;
 
-            MoveObject(renderObject);
+                MoveObject(renderObject);
+                break;
         }
 
         return true;
@@ -79,6 +83,11 @@ public class MovementController
 
     public bool MouseMove(Vector2 currentPoint)
     {
+        if (MovingType == MovingType.LightSource)
+        {
+            return false;
+        }
+        
         if (!_dragPosition.HasValue)
             return false;
 
@@ -86,8 +95,8 @@ public class MovementController
 
         delta.X = delta.X.ToRadian();
         delta.Y = delta.Y.ToRadian();
-
-        var rotationObject = ControlCamera ? _camera : _getCurrentRenderObject();
+        
+        var rotationObject = MovingType == MovingType.Camera ? _scene.Camera : _getCurrentRenderObject();
 
         if (rotationObject == null)
         {

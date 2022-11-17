@@ -25,16 +25,27 @@ public partial class Form1 : Form
                 ScreenHeight = DrawField.Height,
                 Pivot =
                 {
-                    Translation = new Vector3((float)CameraX.Value, (float)CameraY.Value, (float)CameraZ.Value)
+                    Translation = new Vector3((float)CameraX.Value, (float)CameraY.Value, (float)CameraZ.Value),
+                    Rotation = new Vector3(((float)CameraYaw.Value).ToRadian(), ((float)CameraPitch.Value).ToRadian(),
+                        ((float)CameraRoll.Value).ToRadian()),
                 },
                 NearPlane = (float)NearPlaneDist.Value,
                 FarPlane = (float)FarPlaneDist.Value,
                 FieldOfView = ((float)CameraFoV.Value).ToRadian()
+            },
+            LightSource =
+            {
+                Pivot =
+                {
+                    Translation = new Vector3((float)LightPositionX.Value, (float)LightPositionY.Value, (float)LightPositionZ.Value),
+                    Rotation = new Vector3(((float)LightColorR.Value).ToRadian(), ((float)LightColorG.Value).ToRadian(),
+                        ((float)LightColorB.Value).ToRadian()),
+                }
             }
         };
 
         _fileParser = new ObjFileParser();
-        _movementController = new MovementController(_scene.Camera, GetCurrentSelectedRenderObject);
+        _movementController = new MovementController(_scene, GetCurrentSelectedRenderObject);
         var drawer = new Drawer(() =>
             BufferedGraphicsManager.Current.Allocate(DrawField.CreateGraphics(), DrawField.DisplayRectangle),
             DrawField.Width, DrawField.Height);
@@ -121,6 +132,23 @@ public partial class Form1 : Form
     {
         UpdateCurrentObjectControls();
     }
+    
+    private void SetLightSettings_Click(object sender, EventArgs e)
+    {
+        _scene.LightSource.Pivot.Translation = new Vector3(
+            (float)LightPositionX.Value,
+            (float)LightPositionY.Value,
+            (float)LightPositionZ.Value);
+
+        _scene.LightSource.LightColor = Color.FromArgb(255,
+            (int)LightColorR.Value, 
+            (int)LightColorG.Value, 
+            (int)LightColorB.Value);
+
+        _scene.LightSource.Intensity = (float)LightIntensity.Value;
+        
+        _renderer.Render();
+    }
 
     private void UpdateCameraControls()
     {
@@ -151,15 +179,27 @@ public partial class Form1 : Form
         ObjectScaleY.Value = (decimal)renderObject.Pivot.Scale.Y;
         ObjectScaleZ.Value = (decimal)renderObject.Pivot.Scale.Z;
     }
+    
+    private void UpdateLightControls()
+    {
+        LightPositionX.Value = (decimal)_scene.LightSource.Pivot.Translation.X;
+        LightPositionY.Value = (decimal)_scene.LightSource.Pivot.Translation.Y;
+        LightPositionZ.Value = (decimal)_scene.LightSource.Pivot.Translation.Z;
+    }
 
     private void UseObjectRadioButton_CheckedChanged(object sender, EventArgs e)
     {
-        _movementController.ControlCamera = !UseObjectRadioButton.Checked;
+        _movementController.MovingType = MovingType.Object;
     }
 
     private void UseCameraRadioButton_CheckedChanged(object sender, EventArgs e)
     {
-        _movementController.ControlCamera = UseCameraRadioButton.Checked;
+        _movementController.MovingType = MovingType.Camera;
+    }
+    
+    private void UseLightRadioButton_CheckedChanged(object sender, EventArgs e)
+    {
+        _movementController.MovingType = MovingType.LightSource;
     }
 
     private void Form1_KeyDown(object sender, KeyEventArgs e)
@@ -184,6 +224,8 @@ public partial class Form1 : Form
 
         UpdateCameraControls();
         UpdateCurrentObjectControls();
+        UpdateLightControls();
+        
         _renderer.Render();
     }
 

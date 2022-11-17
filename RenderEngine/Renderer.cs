@@ -27,23 +27,31 @@ public class Renderer
 		using (_graphics = _drawer.GetGraphics())
 		{
 			_scene.Camera.RefreshTransformationMatrix();
+			_scene.LightSource.RefreshTransformationMatrix();
 
 			foreach (var renderObject in _scene.RenderObjects)
 			{
-				renderObject.RefreshTransformationMatrix();
-				
-				var finalTransformationMatrix = new MatrixBox(_scene.Camera.GetFinalTransformationMatrix(renderObject.Pivot));
-				
-				foreach (var polygon in renderObject.Polygons)
-				{
-					var renderTask = RenderTaskPool.GetTask(renderObject, polygon, finalTransformationMatrix);
-					DrawPolygon(renderTask);
-					//ThreadPool.QueueUserWorkItem(DrawPolygon, renderTask, true);
-				}
+				Render(renderObject);
 			}
+			
+			Render(_scene.LightSource);
 			
 			RenderTaskPool.WaitUntilAllFinished();
 			_graphics.Render();
+		}
+	}
+
+	private void Render(RenderObject renderObject)
+	{
+		renderObject.RefreshTransformationMatrix();
+				
+		var finalTransformationMatrix = new MatrixBox(_scene.Camera.GetFinalTransformationMatrix(renderObject.Pivot));
+				
+		foreach (var polygon in renderObject.Polygons)
+		{
+			var renderTask = RenderTaskPool.GetTask(renderObject, polygon, finalTransformationMatrix);
+			DrawPolygon(renderTask);
+			//ThreadPool.QueueUserWorkItem(DrawPolygon, renderTask, true);
 		}
 	}
 
@@ -72,9 +80,23 @@ public class Renderer
 		
 		var viewVector = Vector3.Normalize(cameraTransformedPoint - polygonTransformedPoint);
 		
-		var facingRatio = Math.Max(0, Vector3.Dot(polygonNormal, viewVector));
+		var facingRatio = Vector3.Dot(polygonNormal, viewVector);
+		if (facingRatio < 0)
+		{
+			VectorArrayPool.ReturnToAvailable(vertexProjections);
+			renderTask.Finish();
+			return;
+		}
 
-		_graphics.FillPolygon(vertexProjections, Color.FromArgb(255, (int)(facingRatio * 255.0f), 0, 0));
+		var lightedColor = _scene.LightSource.CalculateColorOfPolygon(polygonNormal, polygonTransformedPoint,
+			renderTask.RenderObject.BaseColor);
+
+		var resultColor = Color.FromArgb(255, 
+			(int)(facingRatio * lightedColor.R),
+			(int)(facingRatio * lightedColor.G),
+			(int)(facingRatio * lightedColor.B));
+		
+		_graphics.FillPolygon(vertexProjections, resultColor);
 
 		VectorArrayPool.ReturnToAvailable(vertexProjections);
 		renderTask.Finish();

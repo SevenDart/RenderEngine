@@ -13,10 +13,10 @@ public class Camera: RenderObject
 
 	private float AspectRatio => (float)ScreenWidth / ScreenHeight;
 
-	public Camera(Vector3 position)
-    {
-        Pivot = new Pivot { Translation = position };
-    }
+	public Camera()
+	{
+		Pivot = new Pivot();
+	}
 
 	public Vector3 GetScreenPointProjection(Vector3 vertex, Matrix4x4 matrix)
 	{

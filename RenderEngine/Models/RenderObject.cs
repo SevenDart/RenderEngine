@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Drawing;
+using System.Numerics;
 using RenderEngine.Utilities;
 
 namespace RenderEngine.Models;
@@ -8,8 +9,8 @@ public class RenderObject
 	public string Name { get; set; } = null!;
 	public List<Polygon> Polygons { get; set; } = new();
 	public Pivot Pivot { get; set; } = null!;
-
 	public MatrixBox TransformationMatrix { get; set; } = null!;
+	public Color BaseColor { get; set; } = Color.Red;
 
 	public virtual void RefreshTransformationMatrix()
 	{
