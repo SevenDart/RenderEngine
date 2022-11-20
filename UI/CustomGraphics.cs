@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using RenderEngine.Interfaces;
 using RenderEngine.Models;
+using RenderEngine.Utilities.Pools;
 
 namespace UI;
 
@@ -47,44 +48,36 @@ public class CustomGraphics : ICustomGraphics
             maxY = Math.Max(vertexProjections[i].Y, maxY);
         }
 
-        minX = Math.Max(0, (int)Math.Ceiling(minX));
         minY = Math.Max(0, (int)Math.Ceiling(minY));
-        maxX = Math.Min(_width, (int)Math.Floor(maxX));
         maxY = Math.Min(_height, (int)Math.Floor(maxY));
 
         var triangleArea = GetBarycentricCoordinate(vertexProjections[0], vertexProjections[1], vertexProjections[2]);
         
-        for (int i = (int)minX; i <= maxX; i++)
+        for (int y = (int)minY; y <= maxY; y++)
         {
-            for (int j = (int)minY; j <= maxY; j++)
+            GetTriangleIntersection(vertexProjections, y, minX, maxX, out var startPoint, out var endPoint);
+            
+            if (!float.IsNaN(startPoint.X) && !float.IsNaN(endPoint.X))
             {
-                var bc = new Vector3()
-                {
-                    X = GetBarycentricCoordinate(vertexProjections[0], vertexProjections[1], new Vector3(i, j, 0)),
-                    Y = GetBarycentricCoordinate(vertexProjections[1], vertexProjections[2], new Vector3(i, j, 0)),
-                    Z = GetBarycentricCoordinate(vertexProjections[2], vertexProjections[0], new Vector3(i, j, 0))
-                };
-                bc /= triangleArea;
-				
-                var zCoord = 1 / (bc.X / vertexProjections[0].Z + bc.Y / vertexProjections[1].Z + bc.Z / vertexProjections[2].Z);
+                startPoint.X = (float)Math.Floor(startPoint.X);
+                startPoint.Z = GetDepthOfProjection(vertexProjections, GetBarycentricCoordinates(vertexProjections, triangleArea, startPoint));
+                
+                endPoint.Z = GetDepthOfProjection(vertexProjections, GetBarycentricCoordinates(vertexProjections, triangleArea, endPoint));
 
-                if (bc.X >= 0 && bc.Y >= 0 && bc.Z >= 0 && bc.X <= 1 && bc.Y <= 1 && bc.Z <= 1)
-                {
-                    DrawPoint(new Vector3(i, j, zCoord), color);
-                }
+                DrawLine(startPoint, endPoint, color);
             }
         }
     }
 
     public void DrawPoint(Vector3 point, Color color)
     {
-        if (!(point.X < 0 || point.Y < 0 || point.X >= _width || point.Y >= _height))
+        if (point.X < 0 || point.Y < 0 || point.X >= _width || point.Y >= _height) 
+            return;
+
+        if (point.Z <= _depthBuffer![(int)Math.Floor(point.X), (int)Math.Floor(point.Y)])
         {
-            if (point.Z <= _depthBuffer![(int)Math.Floor(point.X), (int)Math.Floor(point.Y)])
-            {
-                _depthBuffer[(int)Math.Floor(point.X), (int)Math.Floor(point.Y)] = point.Z;
-                _bitmap[point.X, point.Y] = color;
-            }
+            _depthBuffer[(int)Math.Floor(point.X), (int)Math.Floor(point.Y)] = point.Z;
+            _bitmap[point.X, point.Y] = color;
         }
     }
 
@@ -128,6 +121,88 @@ public class CustomGraphics : ICustomGraphics
     {
         _bitmap.Dispose();
         _bufferedGraphics.Dispose();
+    }
+
+    private void GetTriangleIntersection(Vector3[] vertexProjections, int yLevel,
+        float minX, float maxX,
+        out Vector3 startPoint, out Vector3 endPoint)
+    {
+        var intersections = VectorArrayPool.GetVectorArray(3);
+
+        var int1 = new Vector3(float.NaN);
+        var int2 = new Vector3(float.NaN);
+
+        for (int i = 0; i < vertexProjections.Length; i++)
+        {
+            intersections[i] = GetLineIntersection(vertexProjections[i], vertexProjections[(i + 1) % 3], yLevel);
+
+            if (!float.IsNaN(intersections[i].X) && intersections[i].X >= minX && intersections[i].X <= maxX 
+                && (intersections[i].X >= Math.Min(vertexProjections[i].X, vertexProjections[(i + 1) % 3].X))
+                && (intersections[i].X <= Math.Max(vertexProjections[i].X, vertexProjections[(i + 1) % 3].X))
+                && (intersections[i].Y >= Math.Min(vertexProjections[i].Y, vertexProjections[(i + 1) % 3].Y))
+                && (intersections[i].Y <= Math.Max(vertexProjections[i].Y, vertexProjections[(i + 1) % 3].Y)))
+            {
+                if (float.IsNaN(int1.X))
+                {
+                    int1 = intersections[i];
+                }
+                else
+                {
+                    int2 = intersections[i];
+                }
+            }
+        }
+
+        startPoint = int1;
+        endPoint = int2;
+
+        if (float.IsNaN(endPoint.X) && !float.IsNaN(startPoint.X))
+        {
+            endPoint = startPoint;
+        }
+        
+        VectorArrayPool.ReturnToAvailable(intersections);
+    }
+
+    private Vector3 GetLineIntersection(Vector3 point1, Vector3 point2, int yLevel)
+    {
+        var a = (point1.Y - point2.Y) /
+                (point1.X - point2.X);
+
+        if (float.IsNaN(a))
+        {
+            return new Vector3(point1.X, yLevel, 0);
+        }
+
+        if (a == 0 && Math.Abs(point1.Y - yLevel) <= float.Epsilon)
+        {
+            return new Vector3(point2.X, yLevel, 0);
+        } 
+        
+        var b = point1.Y - a * point1.X;
+        
+        var x = (yLevel - b) / a;
+
+        return new Vector3(x, yLevel, 0);
+    }
+
+    private float GetDepthOfProjection(Vector3[] vertexProjections, Vector3 barycentricCoords)
+    {
+        return 1 / (barycentricCoords.X / vertexProjections[0].Z + 
+                    barycentricCoords.Y / vertexProjections[1].Z + 
+                    barycentricCoords.Z / vertexProjections[2].Z);
+    }
+
+    private Vector3 GetBarycentricCoordinates(Vector3[] vertices, float triangleArea, Vector3 currentPoint)
+    {
+        var bc = new Vector3
+        {
+            X = GetBarycentricCoordinate(vertices[0], vertices[1], currentPoint),
+            Y = GetBarycentricCoordinate(vertices[1], vertices[2], currentPoint),
+            Z = GetBarycentricCoordinate(vertices[2], vertices[0], currentPoint)
+        };
+
+        return bc / triangleArea;
     }
     
     private float GetBarycentricCoordinate(Vector3 point1, Vector3 point2, Vector3 currentPoint)

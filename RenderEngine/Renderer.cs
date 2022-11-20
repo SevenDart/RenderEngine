@@ -50,8 +50,8 @@ public class Renderer
 		foreach (var polygon in renderObject.Polygons)
 		{
 			var renderTask = RenderTaskPool.GetTask(renderObject, polygon, finalTransformationMatrix);
-			DrawPolygon(renderTask);
-			//ThreadPool.QueueUserWorkItem(DrawPolygon, renderTask, true);
+			//DrawPolygon(renderTask);
+			ThreadPool.QueueUserWorkItem(DrawPolygon, renderTask, true);
 		}
 	}
 
