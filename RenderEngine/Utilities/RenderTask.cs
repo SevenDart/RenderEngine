@@ -85,17 +85,22 @@ public class RenderTask
             return;
         }
 
+        var polygonPoint = bc.Y * Polygon.Vertices[0].Coordinates +
+                    bc.Z * Polygon.Vertices[1].Coordinates +
+                    bc.X * Polygon.Vertices[2].Coordinates
+            ;
+
         var pointNormal = bc.Y * Polygon.Vertices[0].NormalVector!.Value +
                           bc.Z * Polygon.Vertices[1].NormalVector!.Value +
                           bc.X * Polygon.Vertices[2].NormalVector!.Value;
 
-        pointNormal = Vector3.Normalize(pointNormal);
+        pointNormal = Vector3.TransformNormal(pointNormal, RenderObject.TransformationMatrix.Matrix);
 
         var cameraTransformedPoint =
             Vector3.Transform(Vector3.Zero, Scene.Camera.TransformationMatrix.Matrix);
 
         var polygonTransformedPoint =
-            Vector3.Transform(Polygon.Vertices[0].Coordinates, RenderObject.TransformationMatrix.Matrix);
+            Vector3.Transform(polygonPoint, RenderObject.TransformationMatrix.Matrix);
 		
         var viewVector = Vector3.Normalize(cameraTransformedPoint - polygonTransformedPoint);
 		
