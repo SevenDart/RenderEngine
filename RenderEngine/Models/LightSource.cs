@@ -32,9 +32,9 @@ public class LightSource : RenderObject
         var lightStrength = Math.Max(0.01f, angle) * Intensity / (4 * Math.PI * distanceSquared);
 
         var resultColor = Color.FromArgb(255,
-            (int)Math.Max(0, Math.Min(255, LightColor.R * lightStrength * (float)(polygonColor.R + 0.1))),
-            (int)Math.Max(0, Math.Min(255, LightColor.G * lightStrength * (float)(polygonColor.G + 0.1))),
-            (int)Math.Max(0, Math.Min(255, LightColor.B * lightStrength * (float)(polygonColor.B + 0.1)))
+            (int)Math.Max(0, Math.Min(255, LightColor.R * lightStrength * polygonColor.R)),
+            (int)Math.Max(0, Math.Min(255, LightColor.G * lightStrength * polygonColor.G)),
+            (int)Math.Max(0, Math.Min(255, LightColor.B * lightStrength * polygonColor.B))
         );
 
         return resultColor;
