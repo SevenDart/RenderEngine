@@ -49,56 +49,9 @@ public class Renderer
 				
 		foreach (var polygon in renderObject.Polygons)
 		{
-			var renderTask = RenderTaskPool.GetTask(renderObject, polygon, finalTransformationMatrix);
-			DrawPolygon(renderTask);
-			//ThreadPool.QueueUserWorkItem(DrawPolygon, renderTask, true);
+			var renderTask = RenderTaskPool.GetTask(renderObject, polygon, finalTransformationMatrix, _scene, _graphics);
+			//renderTask.DrawPolygon();
+			ThreadPool.QueueUserWorkItem(renderTask.DrawPolygon);
 		}
-	}
-
-	private void DrawPolygon(RenderTask renderTask)
-	{
-		var vertexProjections = VectorArrayPool.GetVectorArray(3);
-
-		for (var i = 0; i < renderTask.Polygon.Vertices.Count; i++)
-		{
-			vertexProjections[i] = _scene.Camera.GetScreenPointProjection(renderTask.Polygon.Vertices[i].Coordinates, renderTask.MatrixBox.Matrix);
-			if (float.IsNaN(vertexProjections[i].X) || float.IsNaN(vertexProjections[i].Y) || float.IsNaN(vertexProjections[i].Z))
-			{
-				VectorArrayPool.ReturnToAvailable(vertexProjections);
-				renderTask.Finish();
-				return;
-			}
-		}
-
-		var polygonNormal = renderTask.Polygon.GetNormalVector(renderTask.RenderObject.TransformationMatrix);
-
-		var cameraTransformedPoint =
-			Vector3.Transform(Vector3.Zero, _scene.Camera.TransformationMatrix.Matrix);
-
-		var polygonTransformedPoint =
-			Vector3.Transform(renderTask.Polygon.Vertices[0].Coordinates, renderTask.RenderObject.TransformationMatrix.Matrix);
-		
-		var viewVector = Vector3.Normalize(cameraTransformedPoint - polygonTransformedPoint);
-		
-		var facingRatio = Vector3.Dot(polygonNormal, viewVector);
-		if (facingRatio < 0)
-		{
-			VectorArrayPool.ReturnToAvailable(vertexProjections);
-			renderTask.Finish();
-			return;
-		}
-
-		var lightedColor = _scene.LightSource.CalculateColorOfPolygon(polygonNormal, polygonTransformedPoint,
-			renderTask.RenderObject.BaseColor);
-
-		var resultColor = Color.FromArgb(255, 
-			(int)(facingRatio * lightedColor.R),
-			(int)(facingRatio * lightedColor.G),
-			(int)(facingRatio * lightedColor.B));
-		
-		_graphics.FillPolygon(vertexProjections, resultColor);
-
-		VectorArrayPool.ReturnToAvailable(vertexProjections);
-		renderTask.Finish();
 	}
 }

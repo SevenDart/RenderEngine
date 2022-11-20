@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using RenderEngine.Interfaces;
 using RenderEngine.Models;
 
 namespace RenderEngine.Utilities.Pools;
@@ -13,19 +14,22 @@ public static class RenderTaskPool
         AvailableTasksQueue = new ConcurrentQueue<RenderTask>();
     }
 
-    public static RenderTask GetTask(RenderObject renderObject, Polygon polygon, MatrixBox renderMatrix)
+    public static RenderTask GetTask(RenderObject renderObject, Polygon polygon, MatrixBox renderMatrix, Scene scene,
+        ICustomGraphics graphics)
     {
         AvailableTasksQueue.TryDequeue(out var availableTask);
 
         if (availableTask == null)
         {
-            availableTask = new RenderTask(renderObject, polygon, renderMatrix);
+            availableTask = new RenderTask(renderObject, polygon, renderMatrix, scene, graphics);
         }
         else
         {
             availableTask.RenderObject = renderObject;
             availableTask.Polygon = polygon;
             availableTask.MatrixBox = renderMatrix;
+            availableTask.Scene = scene;
+            availableTask.Graphics = graphics;
         }
 
         Interlocked.Increment(ref TaskCount);
