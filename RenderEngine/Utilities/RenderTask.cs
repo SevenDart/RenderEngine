@@ -121,7 +121,7 @@ public class RenderTask
         facingRatio = Math.Max(0, facingRatio);
 
         var lightColor =
-            Scene.LightSource.CalculateColorOfPoint(pointNormal, polygonTransformedPoint, RenderObject.BaseColor);
+            Scene.LightSource.CalculateColorOfPointPhong(pointNormal, polygonTransformedPoint, cameraTransformedPoint, RenderObject.BaseColor);
 
         Graphics.DrawPoint(point, Color.FromArgb(255,
             (int)(facingRatio * lightColor.R),

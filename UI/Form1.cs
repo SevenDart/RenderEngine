@@ -40,7 +40,11 @@ public partial class Form1 : Form
                     Translation = new Vector3((float)LightPositionX.Value, (float)LightPositionY.Value, (float)LightPositionZ.Value),
                     Rotation = new Vector3(((float)LightColorR.Value).ToRadian(), ((float)LightColorG.Value).ToRadian(),
                         ((float)LightColorB.Value).ToRadian()),
-                }
+                },
+                AmbientCoefficient = (float)AmbientCoefficientControl.Value,
+                DiffuseCoefficient = (float)DiffuseCoefficientControl.Value,
+                ReflectCoefficient = (float)ReflectCoefficientControl.Value,
+                GlitterCoefficient = (float)GlitterCoefficientControl.Value
             }
         };
 
@@ -146,6 +150,11 @@ public partial class Form1 : Form
             (int)LightColorB.Value);
 
         _scene.LightSource.Intensity = (float)LightIntensity.Value;
+
+        _scene.LightSource.AmbientCoefficient = (float)AmbientCoefficientControl.Value;
+        _scene.LightSource.DiffuseCoefficient = (float)DiffuseCoefficientControl.Value;
+        _scene.LightSource.ReflectCoefficient = (float)ReflectCoefficientControl.Value;
+        _scene.LightSource.GlitterCoefficient = (float)GlitterCoefficientControl.Value;
         
         _renderer.Render();
     }
@@ -261,5 +270,19 @@ public partial class Form1 : Form
             return null;
 
         return _scene.RenderObjects.First(r => r.Name == RenderObjectsList.SelectedItem.ToString());
+    }
+
+    private void ChooseColorButton_Click(object sender, EventArgs e)
+    {
+        SetObjectColorDialog.ShowDialog();
+
+        var renderObject = GetCurrentSelectedRenderObject();
+
+        if (renderObject != null)
+        {
+            renderObject.BaseColor = SetObjectColorDialog.Color;
+        }
+        
+        _renderer.Render();
     }
 }

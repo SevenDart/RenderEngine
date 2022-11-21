@@ -10,7 +10,7 @@ public class RenderObject
 	public List<Polygon> Polygons { get; set; } = new();
 	public Pivot Pivot { get; set; } = null!;
 	public MatrixBox TransformationMatrix { get; set; } = null!;
-	public Color BaseColor { get; set; } = Color.Red;
+	public Color BaseColor { get; set; } = Color.Cyan;
 
 	public virtual void RefreshTransformationMatrix()
 	{
