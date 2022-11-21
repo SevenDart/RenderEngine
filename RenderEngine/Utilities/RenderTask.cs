@@ -87,12 +87,24 @@ public class RenderTask
 
         var polygonPoint = bc.Y * Polygon.Vertices[0].Coordinates +
                     bc.Z * Polygon.Vertices[1].Coordinates +
-                    bc.X * Polygon.Vertices[2].Coordinates
-            ;
+                    bc.X * Polygon.Vertices[2].Coordinates;
 
-        var pointNormal = bc.Y * Polygon.Vertices[0].NormalVector!.Value +
+        Vector3 pointNormal;
+
+        if (!Polygon.Vertices[0].NormalVector.HasValue ||
+            !Polygon.Vertices[1].NormalVector.HasValue ||
+            !Polygon.Vertices[2].NormalVector.HasValue)
+        {
+            pointNormal = Polygon.GetNormalVector(RenderObject.TransformationMatrix);
+        }
+        else
+        {
+            pointNormal = bc.Y * Polygon.Vertices[0].NormalVector!.Value +
                           bc.Z * Polygon.Vertices[1].NormalVector!.Value +
                           bc.X * Polygon.Vertices[2].NormalVector!.Value;
+        }
+        
+        
 
         pointNormal = Vector3.TransformNormal(pointNormal, RenderObject.TransformationMatrix.Matrix);
 
