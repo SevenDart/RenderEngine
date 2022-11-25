@@ -80,6 +80,24 @@ public class CustomBitmap : IDisposable
                 return _palette[valueByte];
             }
 
+
+            if (_bitmapData.PixelFormat == PixelFormat.Format24bppRgb)
+            {
+                offset = (int)(Math.Floor(y) * _width * 3 + Math.Floor(x) * 3);
+                if (offset + 2 < Math.Abs(_bitmapData.Stride) * _bitmapData.Height)
+                {
+                    byte r, g, b, a;
+                    unsafe
+                    {
+                        a = 255;
+                        r = *(byte*)(_bitmapData.Scan0 + offset + 2).ToPointer();
+                        g = *(byte*)(_bitmapData.Scan0 + offset + 1).ToPointer();
+                        b = *(byte*)(_bitmapData.Scan0 + offset + 0).ToPointer();
+                    }
+                    return Color.FromArgb(a, r, g, b);
+                }
+            }
+
             offset = (int)(Math.Floor(y) * _width * 4 + Math.Floor(x) * 4);
             if (offset + 3 < Math.Abs(_bitmapData.Stride) * _bitmapData.Height)
             {
