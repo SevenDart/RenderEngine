@@ -24,7 +24,7 @@ public class ObjFileParser : IFileParser
 				ParseLine(line);
 		}
 
-		var renderObject = new RenderObject()
+		var renderObject = new RenderObject
 		{
 			Name = Path.GetFileName(filepath),
 			Pivot = new Pivot()
@@ -34,6 +34,23 @@ public class ObjFileParser : IFileParser
 		};
 
 		renderObject.Polygons.AddRange(_polygons);
+		
+		var diffuseFilepath = Path.Combine(Path.GetDirectoryName(filepath), Path.GetFileNameWithoutExtension(filepath) + "_diffuse" + ".png");
+		var normalsFilepath = Path.Combine(Path.GetDirectoryName(filepath), Path.GetFileNameWithoutExtension(filepath) + "_nm" + ".png");
+		var reflectionsFilepath = Path.Combine(Path.GetDirectoryName(filepath), Path.GetFileNameWithoutExtension(filepath) + "_spec" + ".png");
+		
+		if (File.Exists(diffuseFilepath))
+		{
+			renderObject.DiffuseTexture = new Texture(diffuseFilepath, TextureType.Diffusion, WrappingType.Repeat);
+		}
+		if (File.Exists(normalsFilepath))
+		{
+			renderObject.NormalsTexture = new Texture(normalsFilepath, TextureType.Normal, WrappingType.Repeat);
+		}
+		if (File.Exists(reflectionsFilepath))
+		{
+			renderObject.ReflectionsTexture = new Texture(reflectionsFilepath, TextureType.Reflection, WrappingType.Repeat);
+		}
 
 		return renderObject;
 	}

@@ -27,11 +27,15 @@ public class LightSource : RenderObject
     }
 
 
-    public Color CalculateColorOfPointPhong(Vector3 pointNormal, Vector3 point, Vector3 cameraPoint, Color baseColor)
+    public Color CalculateColorOfPoint(Vector3 pointNormal, 
+        Vector3 point, 
+        Vector3 cameraPoint, 
+        Color baseColor,
+        float? reflectionCoefficient)
     {
         var ambient = CalculateAmbient();
         var diffuse = CalculateDiffuse(pointNormal, point, baseColor);
-        var reflection = CalculateReflect(pointNormal, point, cameraPoint);
+        var reflection = CalculateReflect(pointNormal, point, cameraPoint, reflectionCoefficient ?? ReflectCoefficient);
 
         var resultColor = Color.FromArgb(255,
             Math.Min(ambient.R + diffuse.R + reflection.R, 255),
@@ -59,7 +63,7 @@ public class LightSource : RenderObject
         
         var angle = Vector3.Dot(lightDirection, pointNormal);
 
-        var lightStrength = DiffuseCoefficient * Math.Max(0, angle) * Intensity / (4 * Math.PI * distanceSquared);
+        var lightStrength = Math.Max(0, angle) * Intensity / (4 * Math.PI * distanceSquared);
 
         var resultColor = Color.FromArgb(255,
             (int)Math.Max(0, Math.Min(255, LightColor.R * lightStrength * baseColor.R)),
@@ -70,7 +74,10 @@ public class LightSource : RenderObject
         return resultColor;
     }
 
-    private Color CalculateReflect(Vector3 pointNormal, Vector3 point, Vector3 cameraPoint)
+    private Color CalculateReflect(Vector3 pointNormal, 
+        Vector3 point, 
+        Vector3 cameraPoint, 
+        float reflectionCoefficient)
     {
         var lightColorPoint = Vector3.Transform(Vector3.Zero, TransformationMatrix.Matrix);
         var lightDirection = Vector3.Normalize(-lightColorPoint + point);

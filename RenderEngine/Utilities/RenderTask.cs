@@ -89,22 +89,7 @@ public class RenderTask
                     bc.Z * Polygon.Vertices[1].Coordinates +
                     bc.X * Polygon.Vertices[2].Coordinates;
 
-        Vector3 pointNormal;
-
-        if (!Polygon.Vertices[0].NormalVector.HasValue ||
-            !Polygon.Vertices[1].NormalVector.HasValue ||
-            !Polygon.Vertices[2].NormalVector.HasValue)
-        {
-            pointNormal = Polygon.GetNormalVector(RenderObject.TransformationMatrix);
-        }
-        else
-        {
-            pointNormal = bc.Y * Polygon.Vertices[0].NormalVector!.Value +
-                          bc.Z * Polygon.Vertices[1].NormalVector!.Value +
-                          bc.X * Polygon.Vertices[2].NormalVector!.Value;
-        }
-        
-        
+        var pointNormal = GetPointNormal(bc);
 
         pointNormal = Vector3.TransformNormal(pointNormal, RenderObject.TransformationMatrix.Matrix);
 
@@ -120,8 +105,12 @@ public class RenderTask
         
         facingRatio = Math.Max(0, facingRatio);
 
+        var pointColor = GetPointColor(bc);
+
+        var reflectionCoefficient = GetReflectionCoefficient(bc);
+        
         var lightColor =
-            Scene.LightSource.CalculateColorOfPointPhong(pointNormal, polygonTransformedPoint, cameraTransformedPoint, RenderObject.BaseColor);
+            Scene.LightSource.CalculateColorOfPoint(pointNormal, polygonTransformedPoint, cameraTransformedPoint, pointColor, reflectionCoefficient);
 
         Graphics.DrawPoint(point, Color.FromArgb(255,
             (int)(facingRatio * lightColor.R),
@@ -154,5 +143,70 @@ public class RenderTask
         RenderTaskPool.ReturnToAvailable(this);
     }
 
-    
+    private Color GetPointColor(Vector3 bc)
+    {
+        var textureCoordinates = GetTextureCoordinates(bc);
+        
+        if (RenderObject.DiffuseTexture != null 
+            && textureCoordinates.HasValue)
+        {
+            var color = RenderObject.DiffuseTexture[textureCoordinates.Value.X, textureCoordinates.Value.Y];
+            return Color.FromArgb(255,
+                (int)color.X,
+                (int)color.Y,
+                (int)color.Z);
+        }
+
+        return RenderObject.BaseColor;
+    }
+
+    private float? GetReflectionCoefficient(Vector3 bc)
+    {
+        var textureCoordinates = GetTextureCoordinates(bc);
+
+        var coefficient = RenderObject.ReflectionsTexture?[textureCoordinates.Value.X, textureCoordinates.Value.Y];
+
+        return coefficient?.X;
+    }
+
+    private Vector3 GetPointNormal(Vector3 bc)
+    {
+        Vector3 pointNormal;
+
+        var textureCoordinates = GetTextureCoordinates(bc);
+        
+        if (RenderObject.NormalsTexture != null 
+            && textureCoordinates.HasValue)
+        {
+            pointNormal = RenderObject.NormalsTexture[textureCoordinates.Value.X, textureCoordinates.Value.Y];
+        }
+        else if (!Polygon.Vertices[0].NormalVector.HasValue ||
+                 !Polygon.Vertices[1].NormalVector.HasValue ||
+                 !Polygon.Vertices[2].NormalVector.HasValue)
+        {
+            pointNormal = Polygon.GetNormalVector(RenderObject.TransformationMatrix);
+        }
+        else
+        {
+            pointNormal = bc.Y * Polygon.Vertices[0].NormalVector!.Value +
+                          bc.Z * Polygon.Vertices[1].NormalVector!.Value +
+                          bc.X * Polygon.Vertices[2].NormalVector!.Value;
+        }
+
+        return Vector3.Normalize(pointNormal);
+    }
+
+    private Vector3? GetTextureCoordinates(Vector3 bc)
+    {
+        if (!Polygon.Vertices[0].TextureCoordinates.HasValue
+            || !Polygon.Vertices[1].TextureCoordinates.HasValue
+            || !Polygon.Vertices[2].TextureCoordinates.HasValue)
+        {
+            return null;
+        }
+        
+        return bc.Y * Polygon.Vertices[0].TextureCoordinates +
+               bc.Z * Polygon.Vertices[1].TextureCoordinates +
+               bc.X * Polygon.Vertices[2].TextureCoordinates;
+    }
 }
