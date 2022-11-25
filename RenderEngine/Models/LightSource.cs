@@ -87,7 +87,7 @@ public class LightSource : RenderObject
         var viewVector = Vector3.Normalize(cameraPoint - point);
 
         var reflectStrength =
-            Math.Pow(Math.Max(0, Vector3.Dot(viewVector, reflectedVector)), GlitterCoefficient) * ReflectCoefficient;
+            Math.Pow(Math.Max(0, Vector3.Dot(viewVector, reflectedVector)), GlitterCoefficient) * reflectionCoefficient;
 
         var resultColor = Color.FromArgb(255,
             (int)Math.Min(LightColor.R * reflectStrength, 255),

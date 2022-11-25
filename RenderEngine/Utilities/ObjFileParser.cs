@@ -41,15 +41,15 @@ public class ObjFileParser : IFileParser
 		
 		if (File.Exists(diffuseFilepath))
 		{
-			renderObject.DiffuseTexture = new Texture(diffuseFilepath, TextureType.Diffusion, WrappingType.Repeat);
+			renderObject.DiffuseTexture = new Texture(diffuseFilepath, TextureType.Diffusion);
 		}
 		if (File.Exists(normalsFilepath))
 		{
-			renderObject.NormalsTexture = new Texture(normalsFilepath, TextureType.Normal, WrappingType.Repeat);
+			renderObject.NormalsTexture = new Texture(normalsFilepath, TextureType.Normal);
 		}
 		if (File.Exists(reflectionsFilepath))
 		{
-			renderObject.ReflectionsTexture = new Texture(reflectionsFilepath, TextureType.Reflection, WrappingType.Repeat);
+			renderObject.ReflectionsTexture = new Texture(reflectionsFilepath, TextureType.Reflection);
 		}
 
 		return renderObject;
