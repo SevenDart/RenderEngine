@@ -103,8 +103,8 @@ public class RenderTask
         }
 
         var polygonPoint = bc.Y * Polygon.Vertices[0].Coordinates +
-                    bc.Z * Polygon.Vertices[1].Coordinates +
-                    bc.X * Polygon.Vertices[2].Coordinates;
+                           bc.Z * Polygon.Vertices[1].Coordinates +
+                           bc.X * Polygon.Vertices[2].Coordinates;
 
         var textureCoordinates = GetTextureCoordinates(bc);
 
@@ -121,6 +121,11 @@ public class RenderTask
         var viewVector = Vector3.Normalize(cameraTransformedPoint - polygonTransformedPoint);
 		
         var facingRatio = Vector3.Dot(pointNormal, viewVector);
+
+        if (facingRatio <= 0)
+        {
+            return;
+        }
         
         facingRatio = Math.Max(0, facingRatio);
 
@@ -134,9 +139,9 @@ public class RenderTask
         var endPoint = new Vector3(point.X, point.Y, point.Z);
         
         var result = Graphics.DrawPoint(endPoint, Color.FromArgb(255,
-            (int)Math.Min(facingRatio * lightColor.R, 255),
-            (int)Math.Min(facingRatio * lightColor.G, 255),
-            (int)Math.Min(facingRatio * lightColor.B, 255)
+            (int)Math.Max(0, Math.Min(facingRatio * lightColor.R, 255)),
+            (int)Math.Max(0,Math.Min(facingRatio * lightColor.G, 255)),
+            (int)Math.Max(0,Math.Min(facingRatio * lightColor.B, 255))
         ));
 
         if (result)
@@ -201,7 +206,7 @@ public class RenderTask
         {
             pointNormal = RenderObject.NormalsTexture[textureCoordinates.Value.X, textureCoordinates.Value.Y];
         }
-        else if (Polygon.TextureCoordinates.Count != 3 
+        else if (Polygon.NormalVectors.Count != 3 
                    || !Polygon.NormalVectors[0].HasValue 
                    || !Polygon.NormalVectors[1].HasValue 
                    || !Polygon.NormalVectors[2].HasValue)
