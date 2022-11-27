@@ -41,11 +41,11 @@ public class Texture
                 );
             
             case TextureType.Normal:
-                return new Vector3(
-                    (color.R / 255.0f) * 2 - 1,
-                    (color.G / 255.0f) * 2 - 1,
-                    (color.B / 255.0f) * 2 - 1
-                );
+                return Vector3.Normalize(new Vector3(
+                    color.R - 127.5f,
+                    color.G - 127.5f,
+                    color.B - 127.5f
+                ));
             
             case TextureType.Reflection:
                 return new Vector3(

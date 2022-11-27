@@ -255,9 +255,9 @@ public partial class Form1 : Form
         {
             var tracerInfo = RenderTask.TracerInfoBuffer![e.X, e.Y];
             debugInfo.Text = $"Point: {tracerInfo.ProjectedPoint.ToString()}\n" +
-                             $"Vertex[0].Coordinates: {tracerInfo.Polygon.Vertices[0].Coordinates}\n" +
-                             $"Vertex[1].Coordinates: {tracerInfo.Polygon.Vertices[1].Coordinates}\n" +
-                             $"Vertex[2].Coordinates: {tracerInfo.Polygon.Vertices[2].Coordinates}\n";
+                             $"Vertex[0].TexCoordinates: {tracerInfo.Polygon.TextureCoordinates[0]}\n" +
+                             $"Vertex[1].TexCoordinates: {tracerInfo.Polygon.TextureCoordinates[1]}\n" +
+                             $"Vertex[2].TexCoordinates: {tracerInfo.Polygon.TextureCoordinates[2]}\n";
         }
         else
         {

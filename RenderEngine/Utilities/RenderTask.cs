@@ -50,6 +50,22 @@ public class RenderTask
             }
         }
 
+        var cameraTransformedPoint =
+            Vector3.Transform(Vector3.Zero, Scene.Camera.TransformationMatrix.Matrix);
+
+        var polygonTransformedPoint =
+            Vector3.Transform(Polygon.Vertices[0].Coordinates, RenderObject.TransformationMatrix.Matrix);
+		
+        var viewVector = Vector3.Normalize(cameraTransformedPoint - polygonTransformedPoint);
+		
+        var facingRatio = Vector3.Dot(Vector3.TransformNormal(Polygon.GetNormalVector(), RenderObject.TransformationMatrix.Matrix), viewVector);
+
+        if (facingRatio < 0)
+        {
+            Finish();
+            return;
+        }
+
         FillPolygon();
 
         /*for (int i = 0; i < _vertexProjections.Length; i++)
@@ -121,12 +137,6 @@ public class RenderTask
         var viewVector = Vector3.Normalize(cameraTransformedPoint - polygonTransformedPoint);
 		
         var facingRatio = Vector3.Dot(pointNormal, viewVector);
-
-        if (facingRatio <= 0)
-        {
-            return;
-        }
-        
         facingRatio = Math.Max(0, facingRatio);
 
         var pointColor = GetPointColor(textureCoordinates);
@@ -211,7 +221,7 @@ public class RenderTask
                    || !Polygon.NormalVectors[1].HasValue 
                    || !Polygon.NormalVectors[2].HasValue)
         {
-            pointNormal = Polygon.GetNormalVector(RenderObject.TransformationMatrix);
+            pointNormal = Polygon.GetNormalVector();
         }
         else
         {
@@ -233,7 +243,7 @@ public class RenderTask
             return null;
         }
 
-        var coordinates = (bc.Y * Polygon.TextureCoordinates[0] / _vertexProjections[0].W ) +
+        var coordinates = (bc.Y * Polygon.TextureCoordinates[0] / _vertexProjections[0].W) +
                           (bc.Z * Polygon.TextureCoordinates[1] / _vertexProjections[1].W ) +
                           (bc.X * Polygon.TextureCoordinates[2] / _vertexProjections[2].W );
         

@@ -59,6 +59,7 @@ public class LightSource : RenderObject
     {
         var lightColorPoint = Vector3.Transform(Vector3.Zero, TransformationMatrix.Matrix);
         var lightDirection = Vector3.Normalize(lightColorPoint - point);
+        
         var distanceSquared = Vector3.DistanceSquared(lightColorPoint, point);
         
         var angle = Vector3.Dot(lightDirection, pointNormal);
