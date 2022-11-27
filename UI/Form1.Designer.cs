@@ -118,6 +118,7 @@ partial class Form1
 			this.GlitterCoefficientControl = new System.Windows.Forms.NumericUpDown();
 			this.SetObjectColorDialog = new System.Windows.Forms.ColorDialog();
 			this.ChooseColorButton = new System.Windows.Forms.Button();
+			this.debugInfo = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.DrawField)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.CameraY)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.CameraX)).BeginInit();
@@ -1383,12 +1384,22 @@ partial class Form1
 			this.ChooseColorButton.UseVisualStyleBackColor = true;
 			this.ChooseColorButton.Click += new System.EventHandler(this.ChooseColorButton_Click);
 			// 
+			// debugInfo
+			// 
+			this.debugInfo.AutoSize = true;
+			this.debugInfo.BackColor = System.Drawing.Color.Transparent;
+			this.debugInfo.Location = new System.Drawing.Point(168, 10);
+			this.debugInfo.Name = "debugInfo";
+			this.debugInfo.Size = new System.Drawing.Size(0, 20);
+			this.debugInfo.TabIndex = 88;
+			// 
 			// Form1
 			// 
 			this.AllowDrop = true;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(1338, 908);
+			this.Controls.Add(this.debugInfo);
 			this.Controls.Add(this.ChooseColorButton);
 			this.Controls.Add(this.label39);
 			this.Controls.Add(this.GlitterCoefficientControl);
@@ -1612,4 +1623,5 @@ partial class Form1
 	private NumericUpDown GlitterCoefficientControl;
 	private ColorDialog SetObjectColorDialog;
 	private Button ChooseColorButton;
+	private Label debugInfo;
 }

@@ -70,6 +70,7 @@ public class ObjFileParser : IFileParser
 		{
 			case "v":
 				var vertex = ParseVertex(inputValues);
+				vertex.Index = _vertices.Count + 1;
 				_vertices.Add(vertex);
 				break;
 			case "vt":
@@ -119,7 +120,8 @@ public class ObjFileParser : IFileParser
 
 	public IEnumerable<Polygon> ParseTriangulatedPolygon(string[] inputValues)
 	{
-		var vertices = new List<Vertex>();
+		var polygonVertices = new List<PolygonVertex>(); 
+
 		foreach (var inputValue in inputValues)
 		{
 			var vertexValues = inputValue.Split('/');
@@ -127,41 +129,48 @@ public class ObjFileParser : IFileParser
 			var index = int.Parse(vertexValues[0]);
 			index = index < 0 ? _vertices.Count - Math.Abs(index) : index - 1;
 			
-			var vertex = _vertices[index];
-			
+			var polygonVertex = new PolygonVertex()
+			{
+				Vertex = _vertices[index]
+			};
+
 			if (vertexValues.Length > 1 && vertexValues[1] != "")
 			{
 				index = int.Parse(vertexValues[1]);
 				index = index < 0 ? _vertexTextures.Count - Math.Abs(index) : index - 1;
-				vertex.TextureCoordinates = _vertexTextures[index];
+				polygonVertex.TextureCoordinate = _vertexTextures[index];
 			}
 			
 			if (vertexValues.Length > 2 && vertexValues[2] != "")
 			{
 				index = int.Parse(vertexValues[2]);
 				index = index < 0 ? _vertexNormals.Count - Math.Abs(index) : index - 1;
-				vertex.NormalVector = _vertexNormals[index];
+				polygonVertex.NormalVector = _vertexNormals[index];
 			}
-			vertices.Add(vertex);
+			polygonVertices.Add(polygonVertex);
 		}
 
-		return TriangulatePolygon(vertices.ToArray());
+		return TriangulatePolygon(polygonVertices.ToArray());
 	}
 
 
-	private IEnumerable<Polygon> TriangulatePolygon(Vertex[] vertices)
+	private IEnumerable<Polygon> TriangulatePolygon(PolygonVertex[] vertices)
 	{
 		if (vertices.Length == 3)
 		{
 			return new Polygon[]
 			{
-				new() { Vertices = vertices.ToList() }
+				new() { 
+					Vertices = vertices.Select(pv => pv.Vertex).ToList(), 
+					TextureCoordinates = vertices.Select(pv => pv.TextureCoordinate).ToList(),
+					NormalVectors = vertices.Select(pv => pv.NormalVector).ToList()
+				}
 			};
 		}
 		
 		var polygons = new List<Polygon>();
 
-		var innerVertices = new List<Vertex>();
+		var innerVertices = new List<PolygonVertex>();
 
 		int index = 2;
 		for (; index < vertices.Length; index += 2)
@@ -171,10 +180,22 @@ public class ObjFileParser : IFileParser
 				innerVertices.Add(vertices[index]);
 				polygons.Add(new Polygon() { 
 					Vertices = new List<Vertex> {
-						vertices[index - 2],
-						vertices[index - 1],
-						vertices[index]
-					} 
+						vertices[index - 2].Vertex,
+						vertices[index - 1].Vertex,
+						vertices[index].Vertex
+					},
+					TextureCoordinates = new List<Vector3?>()
+					{
+						vertices[index - 2].TextureCoordinate,
+						vertices[index - 1].TextureCoordinate,
+						vertices[index - 0].TextureCoordinate,
+					},
+					NormalVectors = new List<Vector3?>()
+					{
+						vertices[index - 2].NormalVector,
+						vertices[index - 1].NormalVector,
+						vertices[index - 0].NormalVector,
+					},
 				});
 			}
 		}
@@ -185,7 +206,7 @@ public class ObjFileParser : IFileParser
 			innerVertices.Add(vertices[^1]);
 		}
 		innerVertices.Add(vertices[0]);
-			
+
 		polygons.AddRange(TriangulatePolygon(innerVertices.ToArray()));
 		return polygons;
 	}
@@ -196,5 +217,12 @@ public class ObjFileParser : IFileParser
 		_vertexTextures.Clear();
 		_vertexNormals.Clear();
 		_polygons.Clear();
+	}
+
+	private class PolygonVertex
+	{
+		public Vertex Vertex;
+		public Vector3? TextureCoordinate;
+		public Vector3? NormalVector;
 	}
 }

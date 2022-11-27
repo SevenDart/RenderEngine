@@ -77,16 +77,18 @@ public class CustomGraphics : ICustomGraphics
         }
     }
 
-    public void DrawPoint(Vector3 point, Color color)
+    public bool DrawPoint(Vector3 point, Color color)
     {
-        if (!(point.X < 0 || point.Y < 0 || point.X >= _width || point.Y >= _height))
-        {
-            if (point.Z <= _depthBuffer![(int)Math.Floor(point.X), (int)Math.Floor(point.Y)])
-            {
-                _depthBuffer[(int)Math.Floor(point.X), (int)Math.Floor(point.Y)] = point.Z;
-                _bitmap[point.X, point.Y] = color;
-            }
-        }
+        if (point.X < 0 || point.Y < 0 || point.X >= _width || point.Y >= _height) 
+            return false;
+        
+        if (!(point.Z <= _depthBuffer![(int)Math.Floor(point.X), (int)Math.Floor(point.Y)])) 
+            return false;
+            
+        _depthBuffer[(int)Math.Floor(point.X), (int)Math.Floor(point.Y)] = point.Z;
+        _bitmap[point.X, point.Y] = color;
+        
+        return true;
     }
 
     public void DrawLine(Vector3 point1, Vector3 point2, Color color)

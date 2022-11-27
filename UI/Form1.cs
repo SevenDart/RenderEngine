@@ -251,6 +251,19 @@ public partial class Form1 : Form
 
     private void DrawField_MouseDown(object sender, MouseEventArgs e)
     {
+        if (e.Button == MouseButtons.Right)
+        {
+            var tracerInfo = RenderTask.TracerInfoBuffer![e.X, e.Y];
+            debugInfo.Text = $"Point: {tracerInfo.ProjectedPoint.ToString()}\n" +
+                             $"Vertex[0].Coordinates: {tracerInfo.Polygon.Vertices[0].Coordinates}\n" +
+                             $"Vertex[1].Coordinates: {tracerInfo.Polygon.Vertices[1].Coordinates}\n" +
+                             $"Vertex[2].Coordinates: {tracerInfo.Polygon.Vertices[2].Coordinates}\n";
+        }
+        else
+        {
+            debugInfo.Text = "";
+        }
+
         _movementController.MouseDown(new Vector2(e.X, e.Y));
     }
 

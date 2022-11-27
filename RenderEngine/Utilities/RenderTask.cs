@@ -14,8 +14,10 @@ public class RenderTask
     public Scene Scene { get; set; }
     public ICustomGraphics Graphics { get; set; }
 
-    private Vector3[] _vertexProjections = null!;
+    private Vector4[] _vertexProjections = null!;
     private float _triangleArea;
+
+    public static TracerInfo[,]? TracerInfoBuffer;
     
     public RenderTask(RenderObject renderObject, Polygon polygon, MatrixBox matrixBox, Scene scene, ICustomGraphics graphics)
     {
@@ -24,11 +26,19 @@ public class RenderTask
         Scene = scene;
         Graphics = graphics;
         RenderObject = renderObject;
+        if (TracerInfoBuffer == null)
+        {
+            TracerInfoBuffer = new TracerInfo[scene.Camera.ScreenWidth, scene.Camera.ScreenHeight];
+            
+            for (int i = 0; i < scene.Camera.ScreenWidth; i++)
+            for (int j = 0; j < scene.Camera.ScreenHeight; j++)
+                TracerInfoBuffer[i, j] = new TracerInfo(new Vector4(), null);
+        }
     }
     
     public void DrawPolygon(object? state)
     {
-        _vertexProjections = VectorArrayPool.GetVectorArray(3);
+        _vertexProjections = VectorArrayPool.GetVector4Array(3);
 
         for (var i = 0; i < Polygon.Vertices.Count; i++)
         {
@@ -41,6 +51,13 @@ public class RenderTask
         }
 
         FillPolygon();
+
+        /*for (int i = 0; i < _vertexProjections.Length; i++)
+        {
+            var v1 = new Vector3(_vertexProjections[i].X, _vertexProjections[i].Y, _vertexProjections[i].Z - 0.01f);
+            var v2 = new Vector3(_vertexProjections[(i + 1) % 3].X, _vertexProjections[(i + 1) % 3].Y, _vertexProjections[(i + 1) % 3].Z - 0.01f);
+            Graphics.DrawLine(v1, v2, Color.Black);
+        }*/
         
         Finish();
     }
@@ -70,12 +87,12 @@ public class RenderTask
         {
             for (int j = (int)minY; j <= maxY; j++)
             {
-                DrawPoint(new Vector3(i, j, 0));
+                DrawPoint(new Vector4(i, j, 0, 0));
             }
         }
     }
 
-    private void DrawPoint(Vector3 point)
+    private void DrawPoint(Vector4 point)
     {
         var bc = GetBarycentricCoordinates(_vertexProjections, _triangleArea, point);
         point.Z = 1 / (bc.X / _vertexProjections[0].Z + bc.Y / _vertexProjections[1].Z + bc.Z / _vertexProjections[2].Z);
@@ -114,14 +131,22 @@ public class RenderTask
         var lightColor =
             Scene.LightSource.CalculateColorOfPoint(pointNormal, polygonTransformedPoint, cameraTransformedPoint, pointColor, reflectionCoefficient);
 
-        Graphics.DrawPoint(point, Color.FromArgb(255,
-            (int)(facingRatio * lightColor.R),
-            (int)(facingRatio * lightColor.G),
-            (int)(facingRatio * lightColor.B)
-            ));
+        var endPoint = new Vector3(point.X, point.Y, point.Z);
+        
+        var result = Graphics.DrawPoint(endPoint, Color.FromArgb(255,
+            (int)Math.Min(facingRatio * lightColor.R, 255),
+            (int)Math.Min(facingRatio * lightColor.G, 255),
+            (int)Math.Min(facingRatio * lightColor.B, 255)
+        ));
+
+        if (result)
+        {
+            TracerInfoBuffer![(int)endPoint.X, (int)endPoint.Y].ProjectedPoint = point;
+            TracerInfoBuffer![(int)endPoint.X, (int)endPoint.Y].Polygon = Polygon;
+        }
     }
 
-    private static Vector3 GetBarycentricCoordinates(Vector3[] vertexProjections, float triangleArea, Vector3 currentPoint)
+    private static Vector3 GetBarycentricCoordinates(Vector4[] vertexProjections, float triangleArea, Vector4 currentPoint)
     {
         var bc = new Vector3()
         {
@@ -134,7 +159,7 @@ public class RenderTask
         return bc;
     }
     
-    private static float GetBarycentricCoordinate(Vector3 point1, Vector3 point2, Vector3 currentPoint)
+    private static float GetBarycentricCoordinate(Vector4 point1, Vector4 point2, Vector4 currentPoint)
     {
         return (currentPoint.X - point1.X) * (point2.Y - point1.Y) - (currentPoint.Y - point1.Y) * (point2.X - point1.X);
     }
@@ -171,22 +196,23 @@ public class RenderTask
     {
         Vector3 pointNormal;
 
-        /*if (RenderObject.NormalsTexture != null 
+        if (RenderObject.NormalsTexture != null 
             && textureCoordinates.HasValue)
         {
             pointNormal = RenderObject.NormalsTexture[textureCoordinates.Value.X, textureCoordinates.Value.Y];
         }
-        else*/ if (!Polygon.Vertices[0].NormalVector.HasValue ||
-                 !Polygon.Vertices[1].NormalVector.HasValue ||
-                 !Polygon.Vertices[2].NormalVector.HasValue)
+        else if (Polygon.TextureCoordinates.Count != 3 
+                   || !Polygon.NormalVectors[0].HasValue 
+                   || !Polygon.NormalVectors[1].HasValue 
+                   || !Polygon.NormalVectors[2].HasValue)
         {
             pointNormal = Polygon.GetNormalVector(RenderObject.TransformationMatrix);
         }
         else
         {
-            pointNormal = bc.Y * Polygon.Vertices[0].NormalVector!.Value +
-                          bc.Z * Polygon.Vertices[1].NormalVector!.Value +
-                          bc.X * Polygon.Vertices[2].NormalVector!.Value;
+            pointNormal = bc.Y * Polygon.NormalVectors[0].Value +
+                          bc.Z * Polygon.NormalVectors[1].Value +
+                          bc.X * Polygon.NormalVectors[2].Value;
         }
 
         return Vector3.Normalize(pointNormal);
@@ -194,16 +220,21 @@ public class RenderTask
 
     private Vector3? GetTextureCoordinates(Vector3 bc)
     {
-        if (!Polygon.Vertices[0].TextureCoordinates.HasValue
-            || !Polygon.Vertices[1].TextureCoordinates.HasValue
-            || !Polygon.Vertices[2].TextureCoordinates.HasValue)
+        if (Polygon.TextureCoordinates.Count != 3 
+            || !Polygon.TextureCoordinates[0].HasValue
+            || !Polygon.TextureCoordinates[1].HasValue
+            || !Polygon.TextureCoordinates[2].HasValue)
         {
             return null;
         }
 
-        var coordinates = bc.Y * Polygon.Vertices[0].TextureCoordinates +
-               bc.Z * Polygon.Vertices[1].TextureCoordinates +
-               bc.X * Polygon.Vertices[2].TextureCoordinates;
+        var coordinates = (bc.Y * Polygon.TextureCoordinates[0] / _vertexProjections[0].W ) +
+                          (bc.Z * Polygon.TextureCoordinates[1] / _vertexProjections[1].W ) +
+                          (bc.X * Polygon.TextureCoordinates[2] / _vertexProjections[2].W );
+        
+        coordinates /= ((bc.Y / _vertexProjections[0].W) +
+                       (bc.Z / _vertexProjections[1].W) +
+                       (bc.X / _vertexProjections[2].W));
 
         return coordinates;
     }

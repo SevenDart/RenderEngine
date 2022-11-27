@@ -12,14 +12,12 @@ public class Renderer
 	private readonly IDrawer _drawer;
 	private readonly Scene _scene;
 	private ICustomGraphics _graphics = null!;
-	private Logger _logger = new Logger();
-
-	private static Random _random = new();
 
 	public Renderer(Scene scene, IDrawer drawer)
 	{
 		_scene = scene;
 		_drawer = drawer;
+		ThreadPool.SetMaxThreads(100, 100);
 	}
 
 	public void Render()
@@ -51,6 +49,10 @@ public class Renderer
 		{
 			var renderTask = RenderTaskPool.GetTask(renderObject, polygon, finalTransformationMatrix, _scene, _graphics);
 			//renderTask.DrawPolygon(null);
+			while (ThreadPool.ThreadCount == 100)
+			{
+				Thread.Yield();
+			}
 			ThreadPool.QueueUserWorkItem(renderTask.DrawPolygon);
 		}
 	}

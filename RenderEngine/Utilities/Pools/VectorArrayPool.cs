@@ -5,28 +5,45 @@ namespace RenderEngine.Utilities.Pools;
 
 public static class VectorArrayPool
 {
-    private static readonly ConcurrentDictionary<int, ConcurrentQueue<Vector3[]>> VectorArraysDictionary;
+    private static readonly ConcurrentDictionary<int, ConcurrentQueue<Vector3[]>> Vector3ArraysDictionary;
+    private static readonly ConcurrentDictionary<int, ConcurrentQueue<Vector4[]>> Vector4ArraysDictionary;
 
     static VectorArrayPool()
     {
-        VectorArraysDictionary = new ConcurrentDictionary<int, ConcurrentQueue<Vector3[]>>();
+        Vector3ArraysDictionary = new ConcurrentDictionary<int, ConcurrentQueue<Vector3[]>>();
+        Vector4ArraysDictionary = new ConcurrentDictionary<int, ConcurrentQueue<Vector4[]>>();
         for (int i = 0; i < 10; i++)
         {
-            VectorArraysDictionary[i] = new ConcurrentQueue<Vector3[]>();
+            Vector3ArraysDictionary[i] = new ConcurrentQueue<Vector3[]>();
+            Vector4ArraysDictionary[i] = new ConcurrentQueue<Vector4[]>();
         }
     }
 
-    public static Vector3[] GetVectorArray(int length)
+    public static Vector3[] GetVector3Array(int length)
     {
-        VectorArraysDictionary[length].TryDequeue(out var availableArray);
+        Vector3ArraysDictionary[length].TryDequeue(out var availableArray);
 
         availableArray ??= new Vector3[length];
+        
+        return availableArray;
+    }
+    
+    public static Vector4[] GetVector4Array(int length)
+    {
+        Vector4ArraysDictionary[length].TryDequeue(out var availableArray);
+
+        availableArray ??= new Vector4[length];
         
         return availableArray;
     }
 
     public static void ReturnToAvailable(Vector3[] array)
     {
-        VectorArraysDictionary[array.Length].Enqueue(array);
+        Vector3ArraysDictionary[array.Length].Enqueue(array);
+    }
+    
+    public static void ReturnToAvailable(Vector4[] array)
+    {
+        Vector4ArraysDictionary[array.Length].Enqueue(array);
     }
 }
