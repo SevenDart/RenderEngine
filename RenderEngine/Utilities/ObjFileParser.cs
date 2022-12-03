@@ -85,7 +85,6 @@ public class ObjFileParser : IFileParser
 					}
 				};
 				_renderObjects.Add(renderObject);
-				ClearData();
 				break;
 		}
 	}
