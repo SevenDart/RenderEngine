@@ -133,11 +133,6 @@ public class RenderTask
 
         var polygonTransformedPoint =
             Vector3.Transform(polygonPoint, RenderObject.TransformationMatrix.Matrix);
-		
-        var viewVector = Vector3.Normalize(cameraTransformedPoint - polygonTransformedPoint);
-		
-        var facingRatio = Vector3.Dot(pointNormal, viewVector);
-        facingRatio = Math.Max(0, facingRatio);
 
         var pointColor = GetPointColor(textureCoordinates);
 
@@ -148,11 +143,7 @@ public class RenderTask
 
         var endPoint = new Vector3(point.X, point.Y, point.Z);
         
-        var result = Graphics.DrawPoint(endPoint, Color.FromArgb(255,
-            (int)Math.Max(0, Math.Min(facingRatio * lightColor.R, 255)),
-            (int)Math.Max(0,Math.Min(facingRatio * lightColor.G, 255)),
-            (int)Math.Max(0,Math.Min(facingRatio * lightColor.B, 255))
-        ));
+        var result = Graphics.DrawPoint(endPoint, lightColor);
 
         if (result)
         {

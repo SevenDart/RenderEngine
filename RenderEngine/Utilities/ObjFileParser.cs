@@ -218,6 +218,7 @@ public class ObjFileParser : IFileParser
 		_vertices.Clear();
 		_vertexTextures.Clear();
 		_vertexNormals.Clear();
+		_renderObjects.Clear();
 	}
 
 	private class PolygonVertex
