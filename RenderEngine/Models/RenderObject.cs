@@ -9,7 +9,7 @@ public class RenderObject
 	public string Name { get; set; } = null!;
 	public List<Polygon> Polygons { get; set; } = new();
 	public Pivot Pivot { get; set; } = null!;
-	public MatrixBox TransformationMatrix { get; set; } = null!;
+	public MatrixBox TransformationMatrix { get; set; } = new(Matrix4x4.Identity);
 	public Color BaseColor { get; set; } = Color.Cyan;
 	public Texture? DiffuseTexture { get; set; }
 	public Texture? NormalsTexture { get; set; }
@@ -17,7 +17,17 @@ public class RenderObject
 
 	public virtual void RefreshTransformationMatrix()
 	{
-		TransformationMatrix = new MatrixBox(Pivot.CreateModelMatrix());
+		var newModelMatrix = Pivot.CreateModelMatrix();
+		
+		if (newModelMatrix == TransformationMatrix.Matrix)
+			return;
+
+		TransformationMatrix.Matrix = newModelMatrix;
+
+		foreach (var vertex in Polygons.SelectMany(p => p.Vertices))
+		{
+			vertex.GlobalCoordinates = Vector3.Transform(vertex.Coordinates, newModelMatrix);
+		}
 	}
 
 	public virtual void Rotate(Vector3 rotationVector)

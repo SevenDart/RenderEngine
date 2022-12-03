@@ -8,12 +8,11 @@ public class LightSource : RenderObject
 {
     public Color LightColor { get; set; } = Color.White;
     public float Intensity { get; set; } = 1;
-
-    public Color AmbientColor { get; set; } = Color.White;
     public float AmbientCoefficient { get; set; } = 0.01f;
     public float DiffuseCoefficient { get; set; } = 0.18f;
     public float ReflectCoefficient { get; set; } = 0.1f;
     public float GlitterCoefficient { get; set; } = 0.1f;
+    private Vector3 _globalCoordinates;
     
     public LightSource()
     {
@@ -25,8 +24,19 @@ public class LightSource : RenderObject
         BaseColor = Color.Yellow;
         Pivot.Scale = new Vector3(0.1f);
     }
+    
+    public override void RefreshTransformationMatrix()
+    {
+        var newModelMatrix = Pivot.CreateModelMatrix();
+		
+        if (newModelMatrix == TransformationMatrix.Matrix)
+            return;
 
+        TransformationMatrix.Matrix = newModelMatrix;
 
+        _globalCoordinates = Vector3.Transform(Vector3.Zero, newModelMatrix);
+    }
+    
     public Color CalculateColorOfPoint(Vector3 pointNormal, 
         Vector3 point, 
         Vector3 cameraPoint, 
@@ -57,10 +67,9 @@ public class LightSource : RenderObject
 
     private Color CalculateDiffuse(Vector3 pointNormal, Vector3 point, Color baseColor)
     {
-        var lightColorPoint = Vector3.Transform(Vector3.Zero, TransformationMatrix.Matrix);
-        var lightDirection = Vector3.Normalize(lightColorPoint - point);
+        var lightDirection = Vector3.Normalize(_globalCoordinates - point);
         
-        var distanceSquared = Vector3.DistanceSquared(lightColorPoint, point);
+        var distanceSquared = Vector3.DistanceSquared(_globalCoordinates, point);
         
         var angle = Vector3.Dot(lightDirection, pointNormal);
 
@@ -80,8 +89,7 @@ public class LightSource : RenderObject
         Vector3 cameraPoint, 
         float reflectionCoefficient)
     {
-        var lightColorPoint = Vector3.Transform(Vector3.Zero, TransformationMatrix.Matrix);
-        var lightDirection = Vector3.Normalize(-lightColorPoint + point);
+        var lightDirection = Vector3.Normalize(-_globalCoordinates + point);
 
         var reflectedVector = Vector3.Normalize(Vector3.Reflect(lightDirection, pointNormal));
 

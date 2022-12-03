@@ -10,12 +10,26 @@ public class Camera: RenderObject
 	public float NearPlane { get; set; }
 	public float FarPlane { get; set; }
 	public float FieldOfView { get; set; }
+	
+	public Vector3 GlobalCoordinates { get; set; }
 
 	private float AspectRatio => (float)ScreenWidth / ScreenHeight;
 
 	public Camera()
 	{
 		Pivot = new Pivot();
+	}
+	
+	public override void RefreshTransformationMatrix()
+	{
+		var newModelMatrix = Pivot.CreateModelMatrix();
+		
+		if (newModelMatrix == TransformationMatrix.Matrix)
+			return;
+
+		TransformationMatrix.Matrix = newModelMatrix;
+
+		GlobalCoordinates = Vector3.Transform(Vector3.Zero, newModelMatrix);
 	}
 
 	public Vector4 GetScreenPointProjection(Vector3 vertex, Matrix4x4 matrix)
@@ -65,10 +79,5 @@ public class Camera: RenderObject
 	    translationVector = Vector3.Transform(translationVector, cameraRotation); 
 	    
 	    base.Move(translationVector);
-    }
-    
-    public override void RefreshTransformationMatrix()
-    {
-	    TransformationMatrix = new MatrixBox(Pivot.CreateModelMatrix());
     }
 }

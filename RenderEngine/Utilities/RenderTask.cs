@@ -50,13 +50,7 @@ public class RenderTask
             }
         }
 
-        var cameraTransformedPoint =
-            Vector3.Transform(Vector3.Zero, Scene.Camera.TransformationMatrix.Matrix);
-
-        var polygonTransformedPoint =
-            Vector3.Transform(Polygon.Vertices[0].Coordinates, RenderObject.TransformationMatrix.Matrix);
-		
-        var viewVector = Vector3.Normalize(cameraTransformedPoint - polygonTransformedPoint);
+        var viewVector = Vector3.Normalize(Scene.Camera.GlobalCoordinates - Polygon.Vertices[0].GlobalCoordinates);
 		
         var facingRatio = Vector3.Dot(Vector3.TransformNormal(Polygon.GetNormalVector(), RenderObject.TransformationMatrix.Matrix), viewVector);
 
@@ -118,9 +112,9 @@ public class RenderTask
             return;
         }
 
-        var polygonPoint = bc.Y * Polygon.Vertices[0].Coordinates +
-                           bc.Z * Polygon.Vertices[1].Coordinates +
-                           bc.X * Polygon.Vertices[2].Coordinates;
+        var polygonPoint = bc.Y * Polygon.Vertices[0].GlobalCoordinates +
+                           bc.Z * Polygon.Vertices[1].GlobalCoordinates +
+                           bc.X * Polygon.Vertices[2].GlobalCoordinates;
 
         var textureCoordinates = GetTextureCoordinates(bc);
 
@@ -128,18 +122,12 @@ public class RenderTask
 
         pointNormal = Vector3.TransformNormal(pointNormal, RenderObject.TransformationMatrix.Matrix);
 
-        var cameraTransformedPoint =
-            Vector3.Transform(Vector3.Zero, Scene.Camera.TransformationMatrix.Matrix);
-
-        var polygonTransformedPoint =
-            Vector3.Transform(polygonPoint, RenderObject.TransformationMatrix.Matrix);
-
         var pointColor = GetPointColor(textureCoordinates);
 
         var reflectionCoefficient = GetReflectionCoefficient(textureCoordinates);
         
         var lightColor =
-            Scene.LightSource.CalculateColorOfPoint(pointNormal, polygonTransformedPoint, cameraTransformedPoint, pointColor, reflectionCoefficient);
+            Scene.LightSource.CalculateColorOfPoint(pointNormal, polygonPoint, Scene.Camera.GlobalCoordinates, pointColor, reflectionCoefficient);
 
         var endPoint = new Vector3(point.X, point.Y, point.Z);
         
