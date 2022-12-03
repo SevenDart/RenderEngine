@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Text.RegularExpressions;
 using RenderEngine;
 using RenderEngine.Interfaces;
 using RenderEngine.Models;
@@ -116,18 +117,25 @@ public partial class Form1 : Form
             return;
 
         var path = OpenObjFileDialog.FileName;
-        var renderObject = await _fileParser.ParseFile(path);
+        var renderObjects = await _fileParser.ParseFile(path);
 
-        //TODO fix adding prefix to dups
-        if (RenderObjectsList.Items.Contains(renderObject.Name))
+        foreach (var renderObject in renderObjects)
         {
-            renderObject.Name += '*';
+            //TODO fix adding prefix to dups
+            var duplicatedRenderObjectName = _scene.RenderObjects
+                .Select(s => s.Name)
+                .FirstOrDefault(s => Regex.IsMatch(s, s + "([0-9]+)"));
+            
+            if (RenderObjectsList.Items.Contains(renderObject.Name))
+            {
+                renderObject.Name += '*';
+            }
+
+            _scene.RenderObjects.Add(renderObject);
+
+            RenderObjectsList.Items.Add(renderObject.Name);
+            RenderObjectsList.SetSelected(RenderObjectsList.Items.Count - 1, true);
         }
-
-        _scene.RenderObjects.Add(renderObject);
-
-        RenderObjectsList.Items.Add(renderObject.Name);
-        RenderObjectsList.SetSelected(RenderObjectsList.Items.Count - 1, true);
 
         _renderer.Render();
     }

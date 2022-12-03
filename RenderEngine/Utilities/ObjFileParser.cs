@@ -9,11 +9,15 @@ public class ObjFileParser : IFileParser
 	private readonly List<Vertex> _vertices = new();
 	private readonly List<Vector3> _vertexTextures = new();
 	private readonly List<Vector3> _vertexNormals = new();
-	private readonly List<Polygon> _polygons = new();
 
-	public async Task<RenderObject> ParseFile(string filepath)
+	private readonly List<RenderObject> _renderObjects = new();
+
+	private string _currentFileName = null!; 
+
+	public async Task<List<RenderObject>> ParseFile(string filepath)
 	{
 		ClearData();
+		_currentFileName = Path.GetFileNameWithoutExtension(filepath);
 		
 		using var file = new StreamReader(filepath);
 
@@ -24,35 +28,7 @@ public class ObjFileParser : IFileParser
 				ParseLine(line);
 		}
 
-		var renderObject = new RenderObject
-		{
-			Name = Path.GetFileName(filepath),
-			Pivot = new Pivot()
-			{
-				Translation = new Vector3(0, 0, 0)
-			}
-		};
-
-		renderObject.Polygons.AddRange(_polygons);
-		
-		var diffuseFilepath = Path.Combine(Path.GetDirectoryName(filepath), Path.GetFileNameWithoutExtension(filepath) + "_diffuse" + ".png");
-		var normalsFilepath = Path.Combine(Path.GetDirectoryName(filepath), Path.GetFileNameWithoutExtension(filepath) + "_nm" + ".png");
-		var reflectionsFilepath = Path.Combine(Path.GetDirectoryName(filepath), Path.GetFileNameWithoutExtension(filepath) + "_spec" + ".png");
-		
-		if (File.Exists(diffuseFilepath))
-		{
-			renderObject.DiffuseTexture = new Texture(diffuseFilepath, TextureType.Diffusion);
-		}
-		if (File.Exists(normalsFilepath))
-		{
-			renderObject.NormalsTexture = new Texture(normalsFilepath, TextureType.Normal);
-		}
-		if (File.Exists(reflectionsFilepath))
-		{
-			renderObject.ReflectionsTexture = new Texture(reflectionsFilepath, TextureType.Reflection);
-		}
-
-		return renderObject;
+		return _renderObjects;
 	}
 
 	public void ParseLine(string input)
@@ -81,9 +57,35 @@ public class ObjFileParser : IFileParser
 				var normalVector = ParseNormalVector(inputValues);
 				_vertexNormals.Add(normalVector);
 				break;
+			
 			case "f":
 				var polygons = ParseTriangulatedPolygon(inputValues);
-				_polygons.AddRange(polygons);
+				if (_renderObjects.Count == 0)
+				{
+					var unnamedRenderObject = new RenderObject
+					{
+						Name = _currentFileName,
+						Pivot = new Pivot()
+						{
+							Translation = new Vector3(0, 0, 0)
+						}
+					};
+					_renderObjects.Add(unnamedRenderObject);
+				}
+				_renderObjects.Last().Polygons.AddRange(polygons);
+				break;
+			
+			case "o":
+				var renderObject = new RenderObject
+				{
+					Name = string.Concat(inputValues),
+					Pivot = new Pivot()
+					{
+						Translation = new Vector3(0, 0, 0)
+					}
+				};
+				_renderObjects.Add(renderObject);
+				ClearData();
 				break;
 		}
 	}
@@ -216,7 +218,6 @@ public class ObjFileParser : IFileParser
 		_vertices.Clear();
 		_vertexTextures.Clear();
 		_vertexNormals.Clear();
-		_polygons.Clear();
 	}
 
 	private class PolygonVertex

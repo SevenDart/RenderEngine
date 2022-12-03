@@ -5,7 +5,7 @@ namespace RenderEngine.Interfaces;
 
 public interface IFileParser
 {
-	Task<RenderObject> ParseFile(string filepath);
+	Task<List<RenderObject>> ParseFile(string filepath);
 	void ParseLine(string input);
 	Vertex ParseVertex(string[] inputValues);
 	Vector3 ParseTextureCoordinates(string[] inputValues);
