@@ -121,20 +121,14 @@ public partial class Form1 : Form
 
         foreach (var renderObject in renderObjects)
         {
-            //TODO fix adding prefix to dups
             var duplicatedRenderObjectName = _scene.RenderObjects
                 .Select(s => s.Name)
-                .FirstOrDefault(s => Regex.IsMatch(s, s + "([0-9]+)"));
+                .Where(s => s.StartsWith(renderObject.Name))
+                .MaxBy(s => s);
 
             if (duplicatedRenderObjectName != null)
             {
-                var indexMatch = Regex.Match(duplicatedRenderObjectName, "([0-9])+");
-                var index = int.Parse(indexMatch.Value.Substring(1, indexMatch.Length - 2));
-                renderObject.Name += $"({index + 1})";
-            }
-            else if (RenderObjectsList.Items.Contains(renderObject.Name))
-            {
-                renderObject.Name += $"({0})";
+                renderObject.Name = duplicatedRenderObjectName + "*";
             }
 
             _scene.RenderObjects.Add(renderObject);
