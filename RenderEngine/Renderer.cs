@@ -91,12 +91,7 @@ public class Renderer
 		var lightedColor = _scene.LightSource.CalculateColorOfPolygon(polygonNormal, polygonTransformedPoint,
 			renderTask.RenderObject.BaseColor);
 
-		var resultColor = Color.FromArgb(255, 
-			(int)(facingRatio * lightedColor.R),
-			(int)(facingRatio * lightedColor.G),
-			(int)(facingRatio * lightedColor.B));
-		
-		_graphics.FillPolygon(vertexProjections, resultColor);
+		_graphics.FillPolygon(vertexProjections, lightedColor);
 
 		VectorArrayPool.ReturnToAvailable(vertexProjections);
 		renderTask.Finish();
