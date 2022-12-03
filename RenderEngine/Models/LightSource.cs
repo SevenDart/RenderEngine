@@ -33,7 +33,7 @@ public class LightSource : RenderObject
         Color baseColor,
         float? reflectionCoefficient)
     {
-        var ambient = CalculateAmbient();
+        var ambient = CalculateAmbient(baseColor);
         var diffuse = CalculateDiffuse(pointNormal, point, baseColor);
         var reflection = CalculateReflect(pointNormal, point, cameraPoint, reflectionCoefficient ?? ReflectCoefficient);
 
@@ -46,12 +46,12 @@ public class LightSource : RenderObject
         return resultColor;
     }
 
-    private Color CalculateAmbient()
+    private Color CalculateAmbient(Color baseColor)
     {
         return Color.FromArgb(255,
-            (int)(AmbientColor.R * AmbientCoefficient), 
-            (int)(AmbientColor.G * AmbientCoefficient), 
-            (int)(AmbientColor.B * AmbientCoefficient)
+            (int)(baseColor.R * AmbientCoefficient), 
+            (int)(baseColor.G * AmbientCoefficient), 
+            (int)(baseColor.B * AmbientCoefficient)
             );
     }
 
