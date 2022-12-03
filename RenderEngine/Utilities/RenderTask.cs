@@ -39,6 +39,21 @@ public class RenderTask
                 return;
             }
         }
+        
+        var cameraTransformedPoint =
+            Vector3.Transform(Vector3.Zero, Scene.Camera.TransformationMatrix.Matrix);
+
+        var polygonTransformedPoint =
+            Vector3.Transform(Polygon.Vertices[0].Coordinates, RenderObject.TransformationMatrix.Matrix);
+		
+        var viewVector = Vector3.Normalize(cameraTransformedPoint - polygonTransformedPoint);
+        var facingRatio = Vector3.Dot(Polygon.GetNormalVector(RenderObject.TransformationMatrix), viewVector);
+
+        if (facingRatio < 0)
+        {
+            Finish();
+            return;
+        }
 
         FillPolygon();
         
@@ -104,8 +119,6 @@ public class RenderTask
                           bc.X * Polygon.Vertices[2].NormalVector!.Value;
         }
         
-        
-
         pointNormal = Vector3.TransformNormal(pointNormal, RenderObject.TransformationMatrix.Matrix);
 
         var cameraTransformedPoint =
@@ -113,21 +126,11 @@ public class RenderTask
 
         var polygonTransformedPoint =
             Vector3.Transform(polygonPoint, RenderObject.TransformationMatrix.Matrix);
-		
-        var viewVector = Vector3.Normalize(cameraTransformedPoint - polygonTransformedPoint);
-		
-        var facingRatio = Vector3.Dot(pointNormal, viewVector);
-        
-        facingRatio = Math.Max(0, facingRatio);
 
         var lightColor =
             Scene.LightSource.CalculateColorOfPointPhong(pointNormal, polygonTransformedPoint, cameraTransformedPoint, RenderObject.BaseColor);
 
-        Graphics.DrawPoint(point, Color.FromArgb(255,
-            (int)(facingRatio * lightColor.R),
-            (int)(facingRatio * lightColor.G),
-            (int)(facingRatio * lightColor.B)
-            ));
+        Graphics.DrawPoint(point, lightColor);
     }
 
     private static Vector3 GetBarycentricCoordinates(Vector3[] vertexProjections, float triangleArea, Vector3 currentPoint)
