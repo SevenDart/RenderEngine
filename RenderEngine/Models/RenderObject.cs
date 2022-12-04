@@ -9,7 +9,7 @@ public class RenderObject
 	public string Name { get; set; } = null!;
 	public List<Polygon> Polygons { get; set; } = new();
 	public Pivot Pivot { get; set; } = null!;
-	public MatrixBox TransformationMatrix { get; set; } = new(Matrix4x4.Identity);
+	public MatrixBox TransformationMatrix { get; set; } = new(new Matrix4x4());
 	public Color BaseColor { get; set; } = Color.Cyan;
 
 	public virtual void RefreshTransformationMatrix()
@@ -21,10 +21,14 @@ public class RenderObject
 
 		TransformationMatrix.Matrix = newModelMatrix;
 
-		foreach (var vertex in Polygons.SelectMany(p => p.Vertices))
+		foreach (var polygon in Polygons)
 		{
-			vertex.GlobalCoordinates = Vector3.Transform(vertex.Coordinates, newModelMatrix);
+			foreach (var vertex in polygon.Vertices)
+			{
+				vertex.GlobalCoordinates = Vector3.Transform(vertex.Coordinates, newModelMatrix);
+			}
 		}
+		
 	}
 
 	public virtual void Rotate(Vector3 rotationVector)
