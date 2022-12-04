@@ -11,6 +11,7 @@ public class ObjFileParser : IFileParser
 	private readonly List<Vector3> _vertexNormals = new();
 	private readonly List<RenderObject> _renderObjects = new();
 	private string _currentFileName = null!;
+	private string _currentFilepath = null!;
 
 	private List<Material> _materials = new();
 	private Material? _currentMaterial = null;
@@ -20,26 +21,21 @@ public class ObjFileParser : IFileParser
 	{
 		ClearData();
 		_currentFileName = Path.GetFileNameWithoutExtension(filepath);
+		_currentFilepath = filepath;
 
-		var materialFileName = Path.Combine(Path.GetDirectoryName(filepath), _currentFileName + ".mtl");
-		if (File.Exists(materialFileName))
-		{
-			_materials = await _materialParser.ParseFile(materialFileName);
-		}
-		
 		using var file = new StreamReader(filepath);
 
 		while (!file.EndOfStream)
 		{
 			var line = await file.ReadLineAsync();
 			if (line != null && line.Length > 0) 
-				ParseLine(line);
+				await ParseLine(line);
 		}
 
 		return _renderObjects;
 	}
 
-	private void ParseLine(string input)
+	private async Task ParseLine(string input)
 	{
 		var spaceIndex = input.IndexOf(' ');
 		if (spaceIndex == -1)
@@ -52,6 +48,13 @@ public class ObjFileParser : IFileParser
 
 		switch (lineType)
 		{
+			case "mtllib":
+				var materialFileName = Path.Combine(Path.GetDirectoryName(_currentFilepath), inputValues[0]);
+				if (File.Exists(materialFileName))
+				{
+					_materials = await _materialParser.ParseFile(materialFileName);
+				}
+				break;
 			case "v":
 				var vertex = ParseVertex(inputValues);
 				vertex.Index = _vertices.Count + 1;
@@ -237,6 +240,7 @@ public class ObjFileParser : IFileParser
 		_vertexNormals.Clear();
 		_renderObjects.Clear();
 		_materials.Clear();
+		_currentMaterial = null;
 	}
 
 	private class PolygonVertex
