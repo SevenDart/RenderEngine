@@ -11,9 +11,6 @@ public class RenderObject
 	public Pivot Pivot { get; set; } = null!;
 	public MatrixBox TransformationMatrix { get; set; } = new(Matrix4x4.Identity);
 	public Color BaseColor { get; set; } = Color.Cyan;
-	public Texture? DiffuseTexture { get; set; }
-	public Texture? NormalsTexture { get; set; }
-	public Texture? ReflectionsTexture { get; set; }
 
 	public virtual void RefreshTransformationMatrix()
 	{

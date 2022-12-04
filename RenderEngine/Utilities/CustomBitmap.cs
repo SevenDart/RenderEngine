@@ -30,6 +30,7 @@ public class CustomBitmap : IDisposable
     public CustomBitmap(string filepath)
     {
         _coordinatesType = CoordinatesType.Normalized;
+
         _bitmap = new Bitmap(filepath);
         _width = _bitmap.Width;
         _height = _bitmap.Height;

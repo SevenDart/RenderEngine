@@ -8,6 +8,7 @@ public class Polygon
 	public List<Vertex> Vertices { get; set; } = new();
 	public List<Vector3?> TextureCoordinates { get; set; } = new();
 	public List<Vector3?> NormalVectors { get; set; } = new();
+	public Material? Material { get; set; }
 
 	public Vector3 GetNormalVector()
 	{

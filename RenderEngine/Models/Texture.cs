@@ -47,7 +47,7 @@ public class Texture
                     color.B - 127.5f
                 ));
             
-            case TextureType.Reflection:
+            case TextureType.Specular:
                 return new Vector3(
                     color.R / 255.0f,
                     color.G / 255.0f,
@@ -80,7 +80,7 @@ public enum TextureType
 {
     Diffusion,
     Normal,
-    Reflection
+    Specular
 }
 
 public enum WrappingType

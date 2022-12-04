@@ -44,7 +44,6 @@ public partial class Form1 : Form
                 },
                 AmbientCoefficient = (float)AmbientCoefficientControl.Value,
                 DiffuseCoefficient = (float)DiffuseCoefficientControl.Value,
-                ReflectCoefficient = (float)ReflectCoefficientControl.Value,
                 GlitterCoefficient = (float)GlitterCoefficientControl.Value
             }
         };
@@ -161,7 +160,6 @@ public partial class Form1 : Form
 
         _scene.LightSource.AmbientCoefficient = (float)AmbientCoefficientControl.Value;
         _scene.LightSource.DiffuseCoefficient = (float)DiffuseCoefficientControl.Value;
-        _scene.LightSource.ReflectCoefficient = (float)ReflectCoefficientControl.Value;
         _scene.LightSource.GlitterCoefficient = (float)GlitterCoefficientControl.Value;
         
         _renderer.Render();

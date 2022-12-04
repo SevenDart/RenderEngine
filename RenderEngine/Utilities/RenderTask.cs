@@ -124,10 +124,15 @@ public class RenderTask
 
         var pointColor = GetPointColor(textureCoordinates);
 
-        var reflectionCoefficient = GetReflectionCoefficient(textureCoordinates);
+        var reflectionCoefficient = GetSpecularCoefficient(textureCoordinates);
         
         var lightColor =
-            Scene.LightSource.CalculateColorOfPoint(pointNormal, polygonPoint, Scene.Camera.GlobalCoordinates, pointColor, reflectionCoefficient);
+            Scene.LightSource.CalculateColorOfPoint(pointNormal, 
+                polygonPoint, 
+                Scene.Camera.GlobalCoordinates, 
+                pointColor, 
+                reflectionCoefficient, 
+                Polygon.Material?.SpecularExponent);
 
         var endPoint = new Vector3(point.X, point.Y, point.Z);
         
@@ -166,34 +171,47 @@ public class RenderTask
 
     private Color GetPointColor(Vector3? textureCoordinates)
     {
-        if (RenderObject.DiffuseTexture != null 
+        if (Polygon.Material?.DiffuseTexture != null 
             && textureCoordinates.HasValue)
         {
-            var color = RenderObject.DiffuseTexture[textureCoordinates.Value.X, textureCoordinates.Value.Y];
+            var color = Polygon.Material.DiffuseTexture[textureCoordinates.Value.X, textureCoordinates.Value.Y];
             return Color.FromArgb(255,
                 (int)color.X,
                 (int)color.Y,
                 (int)color.Z);
         }
 
+        if (Polygon.Material?.Diffuse != null)
+        {
+            return Color.FromArgb(255,
+                (int)(Polygon.Material.Diffuse.X * 255.0f),
+                (int)(Polygon.Material.Diffuse.Y * 255.0f),
+                (int)(Polygon.Material.Diffuse.Z * 255.0f));
+        }
+
         return RenderObject.BaseColor;
     }
 
-    private float? GetReflectionCoefficient(Vector3? textureCoordinates)
+    private Vector3? GetSpecularCoefficient(Vector3? textureCoordinates)
     {
-        var coefficient = RenderObject.ReflectionsTexture?[textureCoordinates.Value.X, textureCoordinates.Value.Y];
+        var coefficient = Polygon.Material?.SpecularColorTexture?[textureCoordinates.Value.X, textureCoordinates.Value.Y];
 
-        return coefficient?.X;
+        if (coefficient == null && Polygon.Material?.Specular != null)
+        {
+            return Polygon.Material.Specular;
+        }
+
+        return coefficient;
     }
 
     private Vector3 GetPointNormal(Vector3 bc, Vector3? textureCoordinates)
     {
         Vector3 pointNormal;
 
-        if (RenderObject.NormalsTexture != null 
+        if (Polygon.Material?.NormalMapTexture != null 
             && textureCoordinates.HasValue)
         {
-            pointNormal = RenderObject.NormalsTexture[textureCoordinates.Value.X, textureCoordinates.Value.Y];
+            pointNormal = Polygon.Material.NormalMapTexture[textureCoordinates.Value.X, textureCoordinates.Value.Y];
         }
         else if (Polygon.NormalVectors.Count != 3 
                    || !Polygon.NormalVectors[0].HasValue 

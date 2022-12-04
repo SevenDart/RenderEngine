@@ -9,15 +9,23 @@ public class ObjFileParser : IFileParser
 	private readonly List<Vertex> _vertices = new();
 	private readonly List<Vector3> _vertexTextures = new();
 	private readonly List<Vector3> _vertexNormals = new();
-
 	private readonly List<RenderObject> _renderObjects = new();
+	private string _currentFileName = null!;
 
-	private string _currentFileName = null!; 
+	private List<Material> _materials = new();
+	private Material? _currentMaterial = null;
+	private readonly IMaterialParser _materialParser = new MaterialParser();
 
 	public async Task<List<RenderObject>> ParseFile(string filepath)
 	{
 		ClearData();
 		_currentFileName = Path.GetFileNameWithoutExtension(filepath);
+
+		var materialFileName = Path.Combine(Path.GetDirectoryName(filepath), _currentFileName + ".mtl");
+		if (File.Exists(materialFileName))
+		{
+			_materials = await _materialParser.ParseFile(materialFileName);
+		}
 		
 		using var file = new StreamReader(filepath);
 
@@ -31,7 +39,7 @@ public class ObjFileParser : IFileParser
 		return _renderObjects;
 	}
 
-	public void ParseLine(string input)
+	private void ParseLine(string input)
 	{
 		var spaceIndex = input.IndexOf(' ');
 		if (spaceIndex == -1)
@@ -72,6 +80,12 @@ public class ObjFileParser : IFileParser
 					};
 					_renderObjects.Add(unnamedRenderObject);
 				}
+
+				foreach (var polygon in polygons)
+				{
+					polygon.Material = _currentMaterial;
+				}
+				
 				_renderObjects.Last().Polygons.AddRange(polygons);
 				break;
 			
@@ -85,6 +99,10 @@ public class ObjFileParser : IFileParser
 					}
 				};
 				_renderObjects.Add(renderObject);
+				break;
+			
+			case "usemtl":
+				_currentMaterial = _materials.First(m => m.Name == string.Concat(inputValues));
 				break;
 		}
 	}
@@ -218,6 +236,7 @@ public class ObjFileParser : IFileParser
 		_vertexTextures.Clear();
 		_vertexNormals.Clear();
 		_renderObjects.Clear();
+		_materials.Clear();
 	}
 
 	private class PolygonVertex

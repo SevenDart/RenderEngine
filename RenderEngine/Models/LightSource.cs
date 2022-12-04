@@ -10,8 +10,8 @@ public class LightSource : RenderObject
     public float Intensity { get; set; } = 1;
     public float AmbientCoefficient { get; set; } = 0.01f;
     public float DiffuseCoefficient { get; set; } = 0.18f;
-    public float ReflectCoefficient { get; set; } = 0.1f;
-    public float GlitterCoefficient { get; set; } = 0.1f;
+    public Vector3 SpecularCoefficient { get; set; } = new(0.5f);
+    public float GlitterCoefficient { get; set; } = 50;
     private Vector3 _globalCoordinates;
     
     public LightSource()
@@ -37,15 +37,20 @@ public class LightSource : RenderObject
         _globalCoordinates = Vector3.Transform(Vector3.Zero, newModelMatrix);
     }
     
-    public Color CalculateColorOfPoint(Vector3 pointNormal, 
-        Vector3 point, 
-        Vector3 cameraPoint, 
+    public Color CalculateColorOfPoint(Vector3 pointNormal,
+        Vector3 point,
+        Vector3 cameraPoint,
         Color baseColor,
-        float? reflectionCoefficient)
+        Vector3? specularCoefficient, 
+        float? specularExponent)
     {
         var ambient = CalculateAmbient(baseColor);
         var diffuse = CalculateDiffuse(pointNormal, point, baseColor);
-        var reflection = CalculateReflect(pointNormal, point, cameraPoint, reflectionCoefficient ?? ReflectCoefficient);
+        var reflection = CalculateReflect(pointNormal, 
+            point, 
+            cameraPoint, 
+            specularCoefficient ?? SpecularCoefficient, 
+            specularExponent ?? GlitterCoefficient);
 
         var resultColor = Color.FromArgb(255,
             Math.Min(ambient.R + diffuse.R + reflection.R, 255),
@@ -87,7 +92,8 @@ public class LightSource : RenderObject
     private Color CalculateReflect(Vector3 pointNormal, 
         Vector3 point, 
         Vector3 cameraPoint, 
-        float reflectionCoefficient)
+        Vector3 specularCoefficient,
+        float specularExponent)
     {
         var lightDirection = Vector3.Normalize(-_globalCoordinates + point);
 
@@ -96,12 +102,12 @@ public class LightSource : RenderObject
         var viewVector = Vector3.Normalize(cameraPoint - point);
 
         var reflectStrength =
-            Math.Pow(Math.Max(0, Vector3.Dot(viewVector, reflectedVector)), GlitterCoefficient) * reflectionCoefficient;
+            Math.Pow(Math.Max(0, Vector3.Dot(viewVector, reflectedVector)), specularExponent);
 
         var resultColor = Color.FromArgb(255,
-            (int)Math.Min(LightColor.R * reflectStrength, 255),
-            (int)Math.Min(LightColor.G * reflectStrength, 255),
-            (int)Math.Min(LightColor.B * reflectStrength, 255)
+            (int)Math.Min(LightColor.R * reflectStrength * specularCoefficient.X, 255),
+            (int)Math.Min(LightColor.G * reflectStrength * specularCoefficient.Y, 255),
+            (int)Math.Min(LightColor.B * reflectStrength * specularCoefficient.Z, 255)
         );
 
         return resultColor;
