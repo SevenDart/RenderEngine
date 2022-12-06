@@ -47,8 +47,8 @@ public class CustomBitmap : IDisposable
         {
             if (_coordinatesType == CoordinatesType.Normalized)
             {
-                x = (float)Math.Round(x * _width);
-                y = (float)Math.Round(y * _height);
+                x = (float)Math.Floor(x * _width);
+                y = (float)Math.Floor(y * _height);
             }
 
             var offset = 0;

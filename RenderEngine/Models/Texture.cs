@@ -9,7 +9,7 @@ public class Texture
     private readonly CustomBitmap _map;
 
     private readonly TextureType _textureType;
-    private readonly WrappingType _wrappingType = WrappingType.MirrorRepeat;
+    private readonly WrappingType _wrappingType = WrappingType.Repeat;
 
     public Texture(string filepath, TextureType textureType)
     {

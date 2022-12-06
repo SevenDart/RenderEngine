@@ -248,6 +248,10 @@ public class RenderTask
                        (bc.Z / _vertexProjections[1].W) +
                        (bc.X / _vertexProjections[2].W));
 
+        /*var coordinates = bc.Y * Polygon.TextureCoordinates[0] +
+                          bc.Z * Polygon.TextureCoordinates[1] +
+                          bc.X * Polygon.TextureCoordinates[2];*/
+
         return coordinates;
     }
 }
