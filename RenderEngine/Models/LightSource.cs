@@ -78,7 +78,7 @@ public class LightSource : RenderObject
         
         var angle = Vector3.Dot(lightDirection, pointNormal);
 
-        var lightStrength = Math.Max(0, angle) * Intensity / (4 * Math.PI * distanceSquared);
+        var lightStrength = Math.Max(0, angle) * Intensity / (Math.Max(0.01, distanceSquared));
 
         var resultColor = Color.FromArgb(255,
             (int)Math.Max(0, Math.Min(255, LightColor.R * lightStrength * baseColor.R)),
